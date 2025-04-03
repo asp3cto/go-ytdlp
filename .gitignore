@@ -6,6 +6,7 @@ bin/*
 *.log
 .env
 *.mp4
+.idea
 !testdata/*.mp4
 cmd/patch-ytdlp/tmp/*
 cmd/patch-ytdlp/*.json
