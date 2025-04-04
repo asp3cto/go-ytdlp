@@ -1,4 +1,4 @@
-module github.com/lrstanley/go-ytdlp
+module github.com/asp3cto/go-ytdlp
 
 go 1.22.0
 
