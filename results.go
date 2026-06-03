@@ -439,7 +439,7 @@ type ExtractedInfo struct {
 	// Subtitles contains the available subtitles, where the key is the language
 	// code, and the value is a list of subtitle formats.
 	Subtitles          map[string][]*ExtractedSubtitle `json:"subtitles,omitempty"`
-	RequestedSubtitles map[string][]*ExtractedSubtitle `json:"requested_subtitles,omitempty"`
+	RequestedSubtitles map[string]*ExtractedSubtitle `json:"requested_subtitles,omitempty"`
 
 	// AutomaticCaptions contains the automatically generated captions instead of
 	// normal subtitles.
