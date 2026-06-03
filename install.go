@@ -5,143 +5,460 @@
 package ytdlp
 
 import (
+	"archive/tar"
+	"archive/zip"
 	"bufio"
 	"bytes"
 	"context"
 	"crypto/sha256"
-	_ "embed"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
+	"net/url"
 	"os"
+	"path"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
+	"github.com/ulikunitz/xz"
 )
 
 const (
-	xdgCacheDir     = "go-ytdlp"       // Cache directory that will be appended to the XDG cache directory.
-	downloadTimeout = 30 * time.Second // HTTP timeout for downloading the yt-dlp binary.
+	xdgCacheDir          = "go-ytdlp"         // Cache directory that will be appended to the XDG cache directory.
+	maxArtifactSizeBytes = 1000 * 1024 * 1024 // 1GB -- unlikely anything to be this size, but prevents most DoS vulnerabilities (e.g. zip bombs).
+	downloadTimeout      = 30 * time.Second   // HTTP timeout for downloading the yt-dlp binary.
 )
 
-var (
-	//go:embed ytdlp-public.key
-	ytdlpPublicKey []byte // From: https://github.com/yt-dlp/yt-dlp/blob/master/public.key
-
-	resolveCache = atomic.Pointer[ResolvedInstall]{} // Should only be used by [Install].
-	installLock  sync.Mutex
-
-	binConfigs = map[string]struct {
-		src  string
-		dest []string
-	}{
-		"darwin_amd64":  {"yt-dlp_macos", []string{"yt-dlp-" + Version, "yt-dlp"}},
-		"darwin_arm64":  {"yt-dlp_macos", []string{"yt-dlp-" + Version, "yt-dlp"}},
-		"linux_amd64":   {"yt-dlp_linux", []string{"yt-dlp-" + Version, "yt-dlp"}},
-		"linux_arm64":   {"yt-dlp_linux_aarch64", []string{"yt-dlp-" + Version, "yt-dlp"}},
-		"linux_armv7l":  {"yt-dlp_linux_armv7l", []string{"yt-dlp-" + Version, "yt-dlp"}},
-		"linux_unknown": {"yt-dlp", []string{"yt-dlp-" + Version, "yt-dlp"}},
-		"windows_amd64": {"yt-dlp.exe", []string{"yt-dlp-" + Version + ".exe", "yt-dlp.exe"}},
-	}
-)
-
-// getDownloadBinary returns the source and destination binary names for the
-// current runtime. If the current runtime is not supported, an error is
-// returned. dest will always be returned (it will be an assumption).
-func getDownloadBinary() (src string, dest []string, err error) {
-	if binary, ok := binConfigs[runtime.GOOS+"_"+runtime.GOARCH]; ok {
-		return binary.src, binary.dest, nil
+// supportsMusl checks if the OS is MUSL based, using "ldd" on "/bin/ls" to see
+// if it's a MUSL binary. This is not a great solution, but there isn't really
+// a great alternative.
+var supportsMusl = sync.OnceValue(func() bool {
+	if runtime.GOOS != "linux" {
+		return false
 	}
 
-	if runtime.GOOS == "linux" {
-		return binConfigs["linux_unknown"].src, binConfigs["linux_unknown"].dest, nil
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "ldd", "/bin/ls")
+	cmd.WaitDelay = 1 * time.Second
+
+	out, err := cmd.Output()
+	if err == nil && strings.Contains(string(out), "musl") {
+		return true
 	}
 
-	var supported []string
-	for k := range binConfigs {
-		supported = append(supported, k)
+	return false
+})
+
+// getBinaryConfig returns the binary configuration for the current runtime.
+// If the current runtime is not supported/found, nil is returned.
+func getBinaryConfig[T any](cfg map[string]T) (*T, error) {
+	var configSupportsMusl bool
+	for k := range cfg {
+		if strings.Contains(k, "musl") {
+			configSupportsMusl = true
+			break
+		}
 	}
 
-	if runtime.GOOS == "windows" {
-		dest = []string{"yt-dlp.exe"}
-	} else {
-		dest = []string{"yt-dlp"}
+	if runtime.GOOS == "linux" && configSupportsMusl && supportsMusl() {
+		if binary, ok := cfg[runtime.GOOS+"_musl_"+runtime.GOARCH]; ok {
+			return &binary, nil
+		}
 	}
 
-	return "", dest, fmt.Errorf("unsupported os/arch combo: %s/%s (supported: %s)", runtime.GOOS, runtime.GOARCH, strings.Join(supported, ", "))
+	if binary, ok := cfg[runtime.GOOS+"_"+runtime.GOARCH]; ok {
+		return &binary, nil
+	}
+
+	if binary, ok := cfg[runtime.GOOS+"_unknown"]; ok {
+		return &binary, nil
+	}
+
+	return nil, fmt.Errorf("no binary configuration for %s", runtime.GOOS+"_"+runtime.GOARCH)
 }
 
-// InstallOptions are configuration options for installing yt-dlp dynamically (when
-// it's not already installed).
-type InstallOptions struct {
-	// DisableDownload is a simple toggle to never allow downloading, which would
-	// be the same as never calling [Install] or [MustInstall] in the first place.
-	DisableDownload bool
-
-	// DisableChecksum disables checksum verification when downloading.
-	DisableChecksum bool
-
-	// AllowVersionMismatch allows mismatched versions to be used and installed.
-	// This will only be used when the yt-dlp executable is resolved outside of
-	// go-ytdlp's cache.
-	//
-	// AllowVersionMismatch is ignored if DisableDownload is true.
-	AllowVersionMismatch bool
-
-	// DownloadURL is the exact url to the binary location to download (and store).
-	// Leave empty to use GitHub + auto-detected os/arch.
-	DownloadURL string
-}
-
-func downloadFile(ctx context.Context, url, dest string, perms os.FileMode) error {
-	f, err := os.OpenFile(dest, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perms)
+// GetCacheDir returns the cache directory for go-ytdlp. Note that it may not be created yet.
+func GetCacheDir() (string, error) {
+	baseCacheDir, err := os.UserCacheDir()
 	if err != nil {
-		return fmt.Errorf("unable to create go-ytdlp dependent cache file %q: %w", dest, err)
+		return "", fmt.Errorf("unable to determine cache directory: %w", err)
 	}
-	defer f.Close()
+	return filepath.Join(baseCacheDir, xdgCacheDir), nil
+}
+
+// RemoveInstallCache removes the cache directory for go-ytdlp, and clears in-memory
+// install resolve caches for all binaries.
+func RemoveInstallCache() error {
+	cacheDir, err := GetCacheDir()
+	if err != nil {
+		return err
+	}
+
+	debug(context.Background(), "removed cache directory", "path", cacheDir)
+	err = os.RemoveAll(cacheDir)
+	if err != nil {
+		return fmt.Errorf("unable to remove cache directory: %w", err)
+	}
+
+	ytdlpResolveCache.Store(nil)
+	ffmpegResolveCache.Store(nil)
+	ffprobeResolveCache.Store(nil)
+	bunResolveCache.Store(nil)
+	return nil
+}
+
+// createCacheDir creates the go-ytdlp cache directory and returns its path.
+func createCacheDir(ctx context.Context) (string, error) {
+	cacheDir, err := GetCacheDir()
+	if err != nil {
+		return "", err
+	}
+
+	_, err = os.Stat(cacheDir)
+	if os.IsNotExist(err) {
+		debug(ctx, "cache directory does not exist, creating", "path", cacheDir)
+	}
+
+	err = os.MkdirAll(cacheDir, 0o750)
+	if err != nil {
+		return "", fmt.Errorf("unable to create cache directory: %w", err)
+	}
+
+	return cacheDir, nil
+}
+
+// MustInstallAll is similar to [InstallAll], but panics if there is an error.
+func MustInstallAll(ctx context.Context) []*ResolvedInstall {
+	installs, err := InstallAll(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return installs
+}
+
+// InstallAll installs all dependencies for go-ytdlp concurrently, using default options.
+// Note that this will not work on all platforms, as some dependencies are only supported on
+// certain platforms.
+func InstallAll(ctx context.Context) ([]*ResolvedInstall, error) {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
+	_, cerr := createCacheDir(ctx)
+	if cerr != nil {
+		return nil, cerr
+	}
+
+	var installs []*ResolvedInstall
+	var errs []error
+
+	wg.Go(func() {
+		r, err := Install(ctx, nil)
+		if err != nil {
+			mu.Lock()
+			errs = append(errs, err)
+			mu.Unlock()
+			return
+		}
+		mu.Lock()
+		installs = append(installs, r)
+		mu.Unlock()
+	})
+
+	wg.Go(func() {
+		r, err := InstallFFmpeg(ctx, nil)
+		if err != nil {
+			mu.Lock()
+			errs = append(errs, err)
+			mu.Unlock()
+			return
+		}
+		mu.Lock()
+		installs = append(installs, r)
+		mu.Unlock()
+	})
+
+	wg.Go(func() {
+		r, err := InstallFFprobe(ctx, nil)
+		if err != nil {
+			mu.Lock()
+			errs = append(errs, err)
+			mu.Unlock()
+			return
+		}
+		mu.Lock()
+		installs = append(installs, r)
+		mu.Unlock()
+	})
+
+	wg.Go(func() {
+		r, err := InstallBun(ctx, nil)
+		if err != nil {
+			mu.Lock()
+			errs = append(errs, err)
+			mu.Unlock()
+			return
+		}
+		mu.Lock()
+		installs = append(installs, r)
+		mu.Unlock()
+	})
+
+	wg.Wait()
+
+	if len(errs) > 0 {
+		return installs, errors.Join(errs...)
+	}
+
+	return installs, nil
+}
+
+// destPathForDownload picks a cache path when the caller did not supply an explicit filename.
+// Prefer Content-Disposition; some hosts (e.g. static zip mirrors) omit it but use a meaningful URL path.
+func destPathForDownload(resp *http.Response, targetDir, rawURL string) (string, error) {
+	if cd := strings.TrimSpace(resp.Header.Get("Content-Disposition")); cd != "" {
+		disposition, params, err := mime.ParseMediaType(cd)
+		if err == nil && disposition == "attachment" && params["filename"] != "" {
+			return filepath.Join(targetDir, params["filename"]), nil
+		}
+	}
+
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return "", fmt.Errorf("parse url: %w", err)
+	}
+
+	base := path.Base(parsed.Path)
+	if unescaped, err := url.PathUnescape(base); err == nil {
+		base = unescaped
+	}
+
+	if base == "" || base == "." || base == "/" {
+		return "", errors.New("unable to determine download filename from url path")
+	}
+
+	return filepath.Join(targetDir, base), nil
+}
+
+func downloadFile(ctx context.Context, rawURL, targetDir, targetName string, perms os.FileMode) (dest string, err error) {
+	debug(
+		ctx, "downloading file",
+		"url", rawURL,
+		"dir", targetDir,
+		"file", targetName,
+	)
 
 	// Download the binary.
 	client := &http.Client{Timeout: downloadTimeout}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, http.NoBody)
 	if err != nil {
-		return fmt.Errorf("unable to download go-ytdlp dependent file %q: request creation: %w", dest, err)
+		return "", fmt.Errorf("unable to download go-ytdlp dependent file %q: request creation: %w", dest, err)
 	}
 
 	req.Header.Set("User-Agent", "github.com/lrstanley/go-ytdlp; version/"+Version)
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("unable to download go-ytdlp dependent file %q: %w", dest, err)
+		return "", fmt.Errorf("unable to download go-ytdlp dependent file %q: %w", dest, err)
 	}
 	defer resp.Body.Close()
 
+	debug(ctx, "received response", "status", resp.StatusCode)
+
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unable to download go-ytdlp dependent file %q: bad status: %s", dest, resp.Status)
+		return "", fmt.Errorf("unable to download go-ytdlp dependent file %q: bad status: %s", dest, resp.Status)
 	}
 
-	_, err = f.ReadFrom(resp.Body)
+	if targetName != "" {
+		dest = targetName
+	} else {
+		dest, err = destPathForDownload(resp, targetDir, rawURL)
+		if err != nil {
+			return "", fmt.Errorf("unable to determine download destination: %w", err)
+		}
+		debug(ctx, "resolved download destination", "dest", dest)
+	}
+
+	debug(ctx, "creating file", "dest", dest)
+
+	f, err := os.OpenFile(dest, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perms)
 	if err != nil {
-		return fmt.Errorf("unable to download go-ytdlp dependent file %q: streaming data: %w", dest, err)
+		return "", fmt.Errorf("unable to create go-ytdlp dependent cache file %q: %w", dest, err)
+	}
+	defer f.Close()
+
+	_, err = io.Copy(f, io.LimitReader(resp.Body, maxArtifactSizeBytes))
+	if err != nil {
+		return "", fmt.Errorf("unable to download go-ytdlp dependent file %q: streaming data: %w", dest, err)
 	}
 
 	err = f.Close()
 	if err != nil {
-		return fmt.Errorf("unable to download go-ytdlp dependent file %q: closing file: %w", dest, err)
+		return "", fmt.Errorf("unable to download go-ytdlp dependent file %q: closing file: %w", dest, err)
 	}
 
-	return nil
+	return dest, nil
 }
 
-func githubReleaseAsset(name string) string {
-	return fmt.Sprintf("https://github.com/yt-dlp/yt-dlp/releases/download/%s/%s", Version, name)
+// isArchiveURL returns true if the URL points to a known archive format.
+func isArchiveURL(url string) bool {
+	lower := strings.ToLower(url)
+	return strings.HasSuffix(lower, ".zip") || strings.HasSuffix(lower, ".tar.xz")
+}
+
+// downloadAndExtractFilesFromArchive downloads an archive from the given URL, extracts the specified files
+// into cacheDir, and removes the archive after extraction.
+func downloadAndExtractFilesFromArchive(ctx context.Context, downloadURL, cacheDir string, filenames []string) error {
+	dest, err := downloadFile(ctx, downloadURL, cacheDir, "", 0o644)
+	if err != nil {
+		return err
+	}
+	defer os.Remove(dest)
+
+	return extractFilesFromArchive(ctx, dest, cacheDir, filenames)
+}
+
+// extractFilesFromArchive extracts the specified files from the given archive (zip, tar.xz) into cacheDir.
+// The archive type is detected from the file extension.
+func extractFilesFromArchive(ctx context.Context, archivePath, cacheDir string, filenames []string) error { //nolint:gocognit
+	switch {
+	case strings.HasSuffix(archivePath, ".zip"):
+		debug(
+			ctx, "extracting zip archive",
+			"archive", archivePath,
+			"cache", cacheDir,
+			"filenames", filenames,
+		)
+
+		reader, err := zip.OpenReader(archivePath)
+		if err != nil {
+			return err
+		}
+		defer reader.Close()
+
+		for _, file := range reader.File {
+			for _, name := range filenames {
+				if !strings.HasSuffix(file.Name, "/"+name) && !strings.HasSuffix(file.Name, "\\"+name) && file.Name != name {
+					continue
+				}
+
+				var rc io.ReadCloser
+				rc, err = file.Open()
+				if err != nil {
+					return err
+				}
+
+				debug(
+					ctx, "extracting file",
+					"archive", archivePath,
+					"cache", cacheDir,
+					"filenames", filenames,
+					"name", name,
+				)
+
+				var outFile *os.File
+				outFile, err = os.OpenFile(filepath.Join(cacheDir, name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755) //nolint:gosec
+				if err != nil {
+					_ = rc.Close()
+					return err
+				}
+
+				_, err = io.Copy(outFile, io.LimitReader(rc, maxArtifactSizeBytes))
+				if err != nil {
+					_ = rc.Close()
+					_ = outFile.Close()
+					return err
+				}
+
+				err = rc.Close()
+				if err != nil {
+					_ = outFile.Close()
+					return err
+				}
+
+				err = outFile.Close()
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	case strings.HasSuffix(archivePath, ".tar.xz"):
+		debug(
+			ctx, "extracting tar.xz archive",
+			"archive", archivePath,
+			"cache", cacheDir,
+			"filenames", filenames,
+		)
+
+		file, err := os.Open(archivePath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		// ref: https://github.com/hashicorp/go-getter/pull/520
+		xzReader, err := xz.NewReader(bufio.NewReader(file))
+		if err != nil {
+			return err
+		}
+
+		tarReader := tar.NewReader(xzReader)
+
+		var header *tar.Header
+
+		for {
+			header, err = tarReader.Next()
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if err != nil {
+				return err
+			}
+
+			for _, name := range filenames {
+				if !strings.HasSuffix(header.Name, "/"+name) && header.Name != name {
+					continue
+				}
+
+				debug(
+					ctx, "extracting file",
+					"archivePath", archivePath,
+					"cacheDir", cacheDir,
+					"filenames", filenames,
+					"name", name,
+				)
+
+				var outFile *os.File
+				outFile, err = os.OpenFile(filepath.Join(cacheDir, name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o755) //nolint:gosec
+				if err != nil {
+					return err
+				}
+
+				_, err = io.Copy(outFile, io.LimitReader(tarReader, maxArtifactSizeBytes))
+				if err != nil {
+					_ = outFile.Close()
+					return err
+				}
+				err = outFile.Close()
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	default:
+		return fmt.Errorf("unsupported archive format for file: %s", archivePath)
+	}
 }
 
 // verifyFileChecksum will verify the checksum of the target file, using the
@@ -152,10 +469,18 @@ func githubReleaseAsset(name string) string {
 //   - checksum file is expected to be SHA256.
 //   - checkAgainst is the name that we should compare to, that will be in the checksum
 //     file. If empty, it will use the base name of targetPath.
-func verifyFileChecksum(checksumPath, signaturePath, targetPath, checkAgainst string) error {
+func verifyFileChecksum(ctx context.Context, checksumPath, signaturePath, targetPath, checkAgainst string) error {
 	if checkAgainst == "" {
 		checkAgainst = filepath.Base(targetPath)
 	}
+
+	debug(
+		ctx, "verifying file checksum",
+		"checksum", checksumPath,
+		"signature", signaturePath,
+		"target", targetPath,
+		"against", checkAgainst,
+	)
 
 	// First validate that the checksum has been properly signed using the known key.
 	keyBuf := bytes.NewBuffer(ytdlpPublicKey)
@@ -222,145 +547,25 @@ func verifyFileChecksum(checksumPath, signaturePath, targetPath, checkAgainst st
 	return fmt.Errorf("unable to find checksum for %s", filepath.Base(targetPath))
 }
 
-// Install will check to see if yt-dlp is installed (if it's the right version),
-// and if not, will download it from GitHub. If yt-dlp is already installed, it will
-// check to see if the version matches (unless disabled with [AllowVersionMismatch]),
-// and if not, will download the same version that go-ytdlp (the version you are using)
-// was built with.
-//
-// Note: If [Install] is not called, go-ytdlp WILL NOT DOWNLOAD yt-dlp. Only use
-// this function if you want to ensure yt-dlp is installed, and are ok with it being
-// downloaded.
-func Install(ctx context.Context, opts *InstallOptions) (*ResolvedInstall, error) {
-	if opts == nil {
-		opts = &InstallOptions{}
-	}
-
-	if r := resolveCache.Load(); r != nil {
-		return r, nil
-	}
-
-	// Ensure only one install invocation is running at a time.
-	installLock.Lock()
-	defer installLock.Unlock()
-
-	resolved, err := resolveExecutable(false, false)
-	if err == nil {
-		if opts.AllowVersionMismatch {
-			resolveCache.Store(resolved)
-			return resolved, nil
-		}
-
-		if resolved.Version == Version {
-			resolveCache.Store(resolved)
-			return resolved, nil
-		}
-
-		// If we're not allowed to download, and the version doesn't match, return
-		// an error.
-		if opts.DisableDownload {
-			return nil, fmt.Errorf("yt-dlp version mismatch: expected %s, got %s", Version, resolved.Version)
-		}
-	}
-
-	if opts.DisableDownload {
-		return nil, errors.New("yt-dlp executable not found, and downloading is disabled")
-	}
-
-	src, dest, err := getDownloadBinary()
-	if err != nil {
-		return nil, err
-	}
-
-	downloadURL := opts.DownloadURL
-
-	if downloadURL == "" {
-		downloadURL = githubReleaseAsset(src)
-	}
-
-	baseCacheDir, err := os.UserCacheDir()
-	if err != nil {
-		return nil, fmt.Errorf("unable to get user cache dir: %w", err)
-	}
-	dir := filepath.Join(baseCacheDir, xdgCacheDir)
-
-	err = os.MkdirAll(dir, 0o750)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create yt-dlp executable cache directory: %w", err)
-	}
-
-	err = downloadFile(ctx, downloadURL, filepath.Join(dir, dest[0]+".tmp"), 0o750) //nolint:gomnd
-	if err != nil {
-		return nil, err
-	}
-
-	if !opts.DisableChecksum {
-		err = downloadFile(ctx, githubReleaseAsset("SHA2-256SUMS"), filepath.Join(dir, "SHA2-256SUMS-"+Version), 0o640) //nolint:gomnd
-		if err != nil {
-			return nil, err
-		}
-
-		err = downloadFile(ctx, githubReleaseAsset("SHA2-256SUMS.sig"), filepath.Join(dir, "SHA2-256SUMS-"+Version+".sig"), 0o640) //nolint:gomnd
-		if err != nil {
-			return nil, err
-		}
-
-		err = verifyFileChecksum(
-			filepath.Join(dir, "SHA2-256SUMS-"+Version),
-			filepath.Join(dir, "SHA2-256SUMS-"+Version+".sig"),
-			filepath.Join(dir, dest[0]+".tmp"),
-			src,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Rename the file to the correct name.
-	err = os.Rename(filepath.Join(dir, dest[0]+".tmp"), filepath.Join(dir, dest[0]))
-	if err != nil {
-		return nil, fmt.Errorf("unable to rename yt-dlp executable: %w", err)
-	}
-
-	// re-resolve now that we've downloaded the binary, and validated things.
-	resolved, err = resolveExecutable(false, true)
-	if err != nil {
-		return nil, err
-	}
-
-	resolveCache.Store(resolved)
-	return resolved, nil
-}
-
-// MustInstall is the same as [Install], but will panic if an error occurs (essentially
-// ensuring yt-dlp is installed, before continuing), and doesn't return any results.
-func MustInstall(ctx context.Context, opts *InstallOptions) {
-	_, err := Install(ctx, opts)
-	if err != nil {
-		panic(err)
-	}
+// ResolvedInstall is the found executable.
+type ResolvedInstall struct {
+	Executable string // Path to the executable.
+	Version    string // Version that was resolved. If [InstallOptions.AllowVersionMismatch] is specified, this will be empty.
+	FromCache  bool   // Whether the executable was resolved from the cache.
+	Downloaded bool   // Whether the executable was downloaded during this invocation.
 }
 
 // resolveExecutable will attempt to resolve the yt-dlp executable, either from
 // the go-ytdlp cache (first), or from the PATH (second). If it's not found, an
 // error is returned.
-func resolveExecutable(fromCache, calleeIsDownloader bool) (r *ResolvedInstall, err error) {
-	if fromCache {
-		r = resolveCache.Load()
-		if r != nil {
-			return r, nil
-		}
-	}
-
-	_, dest, _ := getDownloadBinary() // don't check error yet.
-
+func resolveExecutable(ctx context.Context, calleeIsDownloader, disableSystem bool, binaries []string) (r *ResolvedInstall, err error) {
 	var stat os.FileInfo
 	var bin, baseCacheDir string
 
 	baseCacheDir, err = os.UserCacheDir()
 	if err == nil {
 		// Check out cache dirs first.
-		for _, d := range dest {
+		for _, d := range binaries {
 			bin = filepath.Join(baseCacheDir, xdgCacheDir, d)
 
 			stat, err = os.Stat(bin)
@@ -369,6 +574,8 @@ func resolveExecutable(fromCache, calleeIsDownloader bool) (r *ResolvedInstall, 
 			}
 
 			if !stat.IsDir() && isExecutable(bin, stat) {
+				debug(ctx, "found executable in cache", "path", bin)
+
 				r = &ResolvedInstall{
 					Executable: bin,
 					FromCache:  true,
@@ -376,61 +583,28 @@ func resolveExecutable(fromCache, calleeIsDownloader bool) (r *ResolvedInstall, 
 				}
 				if calleeIsDownloader {
 					r.Version = Version
-				} else {
-					err = r.getVersion()
-					if err != nil {
-						return nil, err
-					}
 				}
 				return r, nil
 			}
 		}
 	}
 
-	// Check PATH for the binary.
-	for _, d := range dest {
-		bin, err = exec.LookPath(d)
-		if err == nil {
-			r = &ResolvedInstall{
-				Executable: bin,
-				FromCache:  false,
-				Downloaded: false,
-			}
+	if !disableSystem {
+		// Check PATH for the binary.
+		for _, d := range binaries {
+			bin, err = exec.LookPath(d)
+			if err == nil {
+				debug(ctx, "found executable in PATH", "path", bin)
 
-			err = r.getVersion()
-			if err != nil {
-				return nil, err
+				return &ResolvedInstall{
+					Executable: bin,
+					FromCache:  false,
+					Downloaded: false,
+				}, nil
 			}
-
-			return r, nil
 		}
 	}
 
 	// Will pick the last error, which is likely without the version suffix, what we want.
-	return nil, fmt.Errorf("unable to resolve yt-dlp executable: %w", err)
-}
-
-// ResolvedInstall is the found yt-dlp executable.
-type ResolvedInstall struct {
-	Executable string // Path to the yt-dlp executable.
-	Version    string // Version of yt-dlp that was resolved. If [InstallOptions.AllowVersionMismatch] is specified, this will be empty.
-	FromCache  bool   // Whether the executable was resolved from the cache.
-	Downloaded bool   // Whether the executable was downloaded during this invocation.
-}
-
-// getVersion returns true if the resolved version of yt-dlp matches the version
-// that go-ytdlp was built with.
-func (r *ResolvedInstall) getVersion() error {
-	var stdout bytes.Buffer
-
-	cmd := exec.Command(r.Executable, "--version") //nolint:gosec
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("unable to run yt-dlp to verify version: %w", err)
-	}
-
-	r.Version = strings.TrimSpace(stdout.String())
-
-	return nil
+	return nil, fmt.Errorf("unable to resolve executable from provided paths (%s): %w", strings.Join(binaries, ", "), err)
 }

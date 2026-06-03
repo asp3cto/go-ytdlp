@@ -5,6 +5,7 @@
 package main
 
 import (
+	"log/slog"
 	"regexp"
 	"slices"
 	"strings"
@@ -24,15 +25,23 @@ type OptionURL struct {
 }
 
 type OptionData struct {
-	Channel      string        `json:"channel"`
-	Version      string        `json:"version"`
-	OptionGroups []OptionGroup `json:"option_groups"`
-	Extractors   []Extractor   `json:"extractors"`
+	Channel      string               `json:"channel"`
+	Version      string               `json:"version"`
+	OptionGroups []OptionGroup        `json:"option_groups"`
+	OptionIDs    map[string][]*Option `json:"option_ids"`
+	Extractors   []Extractor          `json:"extractors"`
 }
 
 func (c *OptionData) Generate() {
 	for i := range c.OptionGroups {
 		c.OptionGroups[i].Generate(c)
+		slog.Info("generated option group", "group", c.OptionGroups[i].Name)
+	}
+
+	for _, g := range c.OptionGroups {
+		for _, o := range g.Options {
+			c.OptionIDs[o.ID] = append(c.OptionIDs[o.ID], &o)
+		}
 	}
 }
 
@@ -53,6 +62,7 @@ func (o *OptionGroup) Generate(parent *OptionData) {
 
 	for i := range o.Options {
 		o.Options[i].Generate(o)
+		slog.Info("generated option", "option", o.Options[i].Flag)
 	}
 
 	// Remove any ignored flags.
@@ -61,16 +71,27 @@ func (o *OptionGroup) Generate(parent *OptionData) {
 	})
 }
 
+func (o *OptionGroup) AllAllowsMultiple() (opts []*Option) {
+	for _, o := range o.Options {
+		if o.AllowsMultiple {
+			opts = append(opts, &o)
+		}
+	}
+	return opts
+}
+
 type Option struct {
 	// Generated fields.
-	Parent     *OptionGroup `json:"-"` // Reference to parent.
-	Name       string       `json:"-"` // simplified name, based off the first found flags.
-	Flag       string       `json:"-"` // first flag (priority on long flags).
-	AllFlags   []string     `json:"-"` // all flags, short + long.
-	ArgNames   []string     `json:"-"` // MetaArgs converted to function arguments.
-	Executable bool         `json:"-"` // if the option means yt-dlp doesn't accept arguments, and some callback is done.
-	Deprecated string       `json:"-"` // if the option is deprecated, this will be the deprecation description.
-	URLs       []OptionURL  `json:"-"` // if the option has any links to the documentation.
+	Parent         *OptionGroup `json:"-"` // Reference to parent.
+	Name           string       `json:"-"` // simplified name, based off the first found flags.
+	Flag           string       `json:"-"` // first flag (priority on long flags).
+	AllFlags       []string     `json:"-"` // all flags, short + long.
+	ArgNames       []string     `json:"-"` // MetaArgs converted to function arguments.
+	Executable     bool         `json:"-"` // if the option means yt-dlp doesn't accept arguments, and some callback is done.
+	NoOverride     bool         `json:"-"` // if the option should not override other flags with the same ID.
+	Deprecated     string       `json:"-"` // if the option is deprecated, this will be the deprecation description.
+	URLs           []OptionURL  `json:"-"` // if the option has any links to the documentation.
+	AllowsMultiple bool         `json:"-"` // if the option allows being invoked multiple times.
 
 	// Command data fields.
 	ID           string   `json:"id"`
@@ -108,10 +129,20 @@ func (o *Option) Generate(parent *OptionGroup) {
 		o.Executable = true
 	}
 
+	if slices.Contains(knownAllowsMultiple, o.ID) || slices.Contains(knownAllowsMultiple, o.Flag) {
+		o.AllowsMultiple = true
+	} else if strings.Contains(o.Help, "used multiple times") || strings.Contains(o.Help, "option multiple times") {
+		o.AllowsMultiple = true
+	}
+
 	for _, d := range deprecatedFlags {
 		if strings.EqualFold(d[0], o.ID) || strings.EqualFold(d[0], o.Flag) {
 			o.Deprecated = d[1]
 		}
+	}
+
+	if slices.Contains(noOverrideIDs, o.ID) {
+		o.NoOverride = true
 	}
 
 	switch o.Type {

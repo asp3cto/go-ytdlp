@@ -3,7 +3,8 @@
   "nodescription": true
 }
 -->
-![logo](https://liam.sh/-/gh/svg/lrstanley/go-ytdlp?layout=left&icon=logos%3Ayoutube-icon&icon.height=70&font=1.2&bg=geometric&bgcolor=rgba%2833%2C+33%2C+33%2C+1%29)
+![banner](https://github.com/user-attachments/assets/25e33513-8134-4e42-95b0-eb2bb52e27be)
+
 
 <!-- template:begin:header -->
 <!-- do not edit anything in this "template" block, its auto-generated -->
@@ -17,9 +18,11 @@
   </a>
 
 
+
   <a href="https://github.com/lrstanley/go-ytdlp/actions?query=workflow%3Atest+event%3Apush">
     <img title="GitHub Workflow Status (test @ master)" src="https://img.shields.io/github/actions/workflow/status/lrstanley/go-ytdlp/test.yml?branch=master&label=test&style=flat-square">
   </a>
+
 
 
 
@@ -61,6 +64,13 @@
   - [Usage](#gear-usage)
   - [Examples](#clap-examples)
     - [Simple](#simple)
+    - [Fancy UI using BubbleTea](#fancy-ui-using-bubbletea)
+  - [Install Function(s) &amp; Binary Management](#package-install-functions--binary-management)
+    - [yt-dlp](#yt-dlp)
+    - [ffmpeg &amp; ffprobe](#ffmpeg--ffprobe)
+    - [bun](#bun)
+      - [Using a different JS runtime](#using-a-different-js-runtime)
+  - [FlagConfig: JSON to/from Flags Conversion &amp; Usage](#flagconfig-json-tofrom-flags-conversion--usage)
   - [Support &amp; Assistance](#raising_hand_man-support--assistance)
   - [Contributing](#handshake-contributing)
   - [License](#balance_scale-license)
@@ -68,12 +78,9 @@
 
 ## :sparkles: Features
 
-**!!! NOTE: go-ytdlp isn't stable yet, and as such, there may be wide-reaching _breaking_ changes,
-until 1.0.0 !!!**
-
 - CLI bindings for yt-dlp -- including all flags/commands.
-- Optional `Install` and `MustInstall` helpers to auto-download the latest supported version of
-  yt-dlp, including proper checksum validation for secure downloads.
+- Optional `Install*` helpers to auto-download the latest supported version of
+  yt-dlp, ffmpeg, ffprobe and bun, including proper checksum validation for secure downloads (yt-dlp only).
   - Worry less about making sure yt-dlp is installed wherever **go-ytdlp** is running from!
 - Carried over help documentation for all functions/methods.
 - Flags with arguments have type mappings according to what the actual flags expect.
@@ -127,6 +134,98 @@ func main() {
 	}
 }
 ```
+
+### Fancy UI using BubbleTea
+
+This example shows how to use **go-ytdlp** and [BubbleTea](https://github.com/charmbracelet/bubbletea)
+to create a fancy, though relatively simple, UI for downloading videos.
+
+![BubbleTea demo](./_examples/bubble-dl/demo.gif)
+
+Source: [bubble-dl](./_examples/bubble-dl)
+
+---
+
+## :package: Install Function(s) & Binary Management
+
+The `Install*` function helpers in **go-ytdlp** allow you to automatically download and cache the
+required binaries (`yt-dlp`, `ffmpeg`, `ffprobe` and `bun`) for your platform. This makes it easy to get
+started without manually installing these dependencies, and ensures the correct versions are used.
+
+> **Note:** Download/installation of `ffmpeg`, `ffprobe` and `bun` is only supported on a handful of platforms.
+> It is still recommended to install them via other means if your platform is not listed below.
+
+### yt-dlp
+
+| OS/Arch         | Download Source                  |
+|-----------------|----------------------------------|
+| darwin_amd64    | https://github.com/yt-dlp/yt-dlp |
+| darwin_arm64    | https://github.com/yt-dlp/yt-dlp |
+| linux_amd64     | https://github.com/yt-dlp/yt-dlp |
+| linux_arm64     | https://github.com/yt-dlp/yt-dlp |
+| linux_armv7l    | https://github.com/yt-dlp/yt-dlp |
+| windows_amd64   | https://github.com/yt-dlp/yt-dlp |
+
+### ffmpeg & ffprobe
+
+| OS/Arch       | ffmpeg/ffprobe Download Source         |
+|---------------|----------------------------------------|
+| darwin_amd64  | https://evermeet.cx/ffmpeg/            |
+| darwin_arm64  | https://www.osxexperts.net/            |
+| linux_amd64   | https://github.com/BtbN/FFmpeg-Builds/ |
+| linux_arm64   | https://github.com/BtbN/FFmpeg-Builds/ |
+| windows_amd64 | https://github.com/BtbN/FFmpeg-Builds/ |
+| windows_arm   | https://github.com/BtbN/FFmpeg-Builds/ |
+
+### bun
+
+| OS/Arch       | bun Download Source                                                            |
+|---------------|--------------------------------------------------------------------------------|
+| darwin_amd64  | https://github.com/oven-sh/bun |
+| darwin_arm64  | https://github.com/oven-sh/bun |
+| linux_amd64   | https://github.com/oven-sh/bun |
+| linux_arm64   | https://github.com/oven-sh/bun |
+| windows_amd64 | https://github.com/oven-sh/bun |
+
+#### Using a different JS runtime
+
+Multiple JavaScript runtimes are supported by **yt-dlp**, in the same way that **yt-dlp** itself handles
+multiple runtimes. However, when using `[Must]InstallAll` (or `[Must]InstallBun`), it will automatically
+enable [Bun](https://bun.com/) by default (and explicitly disable other runtimes). **yt-dlp** prefers
+[Deno](https://deno.com/) over Bun, however, Deno still doesn't support musl-based linux distros (like
+Alpine Linux uses) yet.
+
+Refer to the [official documentation](https://github.com/yt-dlp/yt-dlp/wiki/EJS) for more information.
+
+## FlagConfig: JSON to/from Flags Conversion & Usage
+
+The `FlagConfig` type in **go-ytdlp** enables conversion between JSON and yt-dlp command-line flags.
+This is useful for scenarios such as HTTP APIs, web UIs, or persisting flag configurations in a database.
+
+- **Bidirectional Conversion:** Easily marshal and unmarshal yt-dlp flags to and from JSON. Use
+  `Command.SetFlagConfig` and `Command.GetFlagConfig` to set/get the flag config.
+- **Validation:** Use the provided validation functions and JSON schema to ensure correctness. The
+  JSON body allows duplicate flags (unless using the provided json schema), so always validate before use.
+- **JSON Schema:** The schema (available via the `optiondata.JSONSchema` variable and also
+  [located here](./optiondata/json-schema.json)) can be used for type generation in other languages (e.g.
+  TypeScript) and for client-side validation (e.g. using something like [json-schema-to-zod](https://www.npmjs.com/package/json-schema-to-zod)
+  when working with a web UI).
+- **Persistence:** If storing flag configs in a database, note that yt-dlp flags can change or be removed
+  at any time (in correlation to updates of **go-ytdlp**). Always validate after loading from storage.
+  - If validation fails, clear the invalid values in the JSON before retrying (e.g. using the
+    `ErrMultipleJSONParsingFlags` and `ErrJSONParsingFlag` error types, which include the path in the
+    JSON where the issue occurred).
+- **SupportedExtractors:** If persisting the values from this generated type, remember that extractors
+  can be changed or removed by yt-dlp at any time (in correlation to updates of **go-ytdlp**). If a
+  user requests a retry and the extractor is missing, consider defaulting to `generic` or another fallback.
+- **Intended Usage:** `FlagConfig` is designed for JSON marshalling/unmarshalling only. It is not intended
+  for direct use in Go code unless you are building HTTP servers, persisting configs, or similar use cases.
+  The builder pattern should be used in all other cases.
+
+### Example: HTTP Server which Invokes `go-ytdlp`
+
+You can find an example of how to use the `FlagConfig` type for HTTP server integration in the
+[`_examples/http-server`](./_examples/http-server) directory.
 
 ---
 

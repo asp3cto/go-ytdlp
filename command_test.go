@@ -8,16 +8,17 @@ package ytdlp
 import (
 	"context"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
+	"sync"
 	"testing"
 	"time"
 )
 
 func TestMain(m *testing.M) {
-	MustInstall(context.Background(), nil)
+	os.Setenv("YTDLP_DEBUG", "true")
+	MustInstallAll(context.TODO())
 	os.Exit(m.Run())
 }
 
@@ -36,6 +37,8 @@ var sampleFiles = []testSampleFile{
 }
 
 func TestCommand_Simple(t *testing.T) {
+	t.Parallel()
+
 	dir := t.TempDir()
 
 	var urls []string
@@ -46,7 +49,8 @@ func TestCommand_Simple(t *testing.T) {
 
 	progressUpdates := map[string]ProgressUpdate{}
 
-	res, err := New().
+	res, rerr := New().
+		NoUpdate().
 		Verbose().
 		PrintJSON().
 		NoProgress().
@@ -56,8 +60,8 @@ func TestCommand_Simple(t *testing.T) {
 			progressUpdates[prog.Filename] = prog
 		}).
 		Run(context.Background(), urls...)
-	if err != nil {
-		t.Fatal(err)
+	if rerr != nil {
+		t.Fatal(rerr)
 	}
 
 	if res == nil {
@@ -86,11 +90,11 @@ func TestCommand_Simple(t *testing.T) {
 
 	for _, f := range sampleFiles {
 		t.Run(f.name, func(t *testing.T) {
-			var stat fs.FileInfo
+			t.Parallel()
 
 			fn := filepath.Join(dir, fmt.Sprintf("%s - %s.%s", f.extractor, f.name, f.ext))
 
-			stat, err = os.Stat(fn)
+			stat, err := os.Stat(fn)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -127,9 +131,9 @@ func TestCommand_Simple(t *testing.T) {
 }
 
 func TestCommand_Version(t *testing.T) {
-	MustInstall(context.Background(), nil)
+	t.Parallel()
 
-	res, err := New().Version(context.Background())
+	res, err := New().NoUpdate().Version(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,11 +153,12 @@ func TestCommand_Version(t *testing.T) {
 }
 
 func TestCommand_Unset(t *testing.T) {
-	MustInstall(context.Background(), nil)
+	t.Parallel()
 
-	builder := New().Progress().NoProgress().Output("test.mp4")
+	builder := New().NoUpdate().Progress().NoProgress().Output("test.mp4")
 
-	cmd := builder.buildCommand(context.TODO(), sampleFiles[0].url)
+	bunResolveCache.Store(nil) // Explicitly clear the resolve cache for bun, so it doesn't inject itself into the command.
+	cmd := builder.BuildCommand(context.TODO(), sampleFiles[0].url)
 
 	// Make sure --no-progress is set.
 	if !slices.Contains(cmd.Args, "--no-progress") {
@@ -162,27 +167,28 @@ func TestCommand_Unset(t *testing.T) {
 
 	_ = builder.UnsetProgress()
 
-	cmd = builder.buildCommand(context.TODO(), sampleFiles[0].url)
+	bunResolveCache.Store(nil) // Explicitly clear the resolve cache for bun, so it doesn't inject itself into the command.
+	cmd = builder.BuildCommand(context.TODO(), sampleFiles[0].url)
 
 	// Make sure --no-progress is not set.
 	if slices.Contains(cmd.Args, "--no-progress") {
 		t.Fatal("expected --no-progress flag to not be set")
 	}
 
-	// Progress and NoProgress should conflict, so arg length should be 4 (executable, output, output value, and url).
-	if len(cmd.Args) != 4 {
+	// Progress and NoProgress should conflict, so arg length should be 5 (no-update, executable, output, output value, and url).
+	if len(cmd.Args) != 5 {
 		t.Fatalf("expected arg length to be 4, got %d: %#v", len(cmd.Args), cmd.Args)
 	}
 }
 
 func TestCommand_Clone(t *testing.T) {
-	MustInstall(context.Background(), nil)
+	t.Parallel()
 
-	builder1 := New().NoProgress().Output("test.mp4")
+	builder1 := New().NoUpdate().NoProgress().Output("test.mp4")
 
 	builder2 := builder1.Clone()
 
-	cmd := builder2.buildCommand(context.TODO(), sampleFiles[0].url)
+	cmd := builder2.BuildCommand(context.TODO(), sampleFiles[0].url)
 
 	// Make sure --no-progress is set.
 	if !slices.Contains(cmd.Args, "--no-progress") {
@@ -191,9 +197,9 @@ func TestCommand_Clone(t *testing.T) {
 }
 
 func TestCommand_SetExecutable(t *testing.T) {
-	MustInstall(context.Background(), nil)
+	t.Parallel()
 
-	cmd := New().SetExecutable("/usr/bin/test").buildCommand(context.Background(), sampleFiles[0].url)
+	cmd := New().NoUpdate().SetExecutable("/usr/bin/test").BuildCommand(context.Background(), sampleFiles[0].url)
 
 	if cmd.Path != "/usr/bin/test" {
 		t.Fatalf("expected executable to be /usr/bin/test, got %s", cmd.Path)
@@ -201,9 +207,9 @@ func TestCommand_SetExecutable(t *testing.T) {
 }
 
 func TestCommand_SetWorkDir(t *testing.T) {
-	MustInstall(context.Background(), nil)
+	t.Parallel()
 
-	cmd := New().SetWorkDir("/tmp").buildCommand(context.Background(), sampleFiles[0].url)
+	cmd := New().NoUpdate().SetWorkDir("/tmp").BuildCommand(context.Background(), sampleFiles[0].url)
 
 	if cmd.Dir != "/tmp" {
 		t.Fatalf("expected workdir to be /tmp, got %s", cmd.Dir)
@@ -211,11 +217,121 @@ func TestCommand_SetWorkDir(t *testing.T) {
 }
 
 func TestCommand_SetEnvVar(t *testing.T) {
-	MustInstall(context.Background(), nil)
+	t.Parallel()
 
-	cmd := New().SetEnvVar("TEST", "1").buildCommand(context.Background(), sampleFiles[0].url)
+	cmd := New().NoUpdate().SetEnvVar("TEST", "1").BuildCommand(context.Background(), sampleFiles[0].url)
 
-	if cmd.Env[0] != "TEST=1" {
-		t.Fatalf("expected env var to be TEST=1, got %s", cmd.Env[0])
+	if !slices.Contains(cmd.Env, "TEST=1") {
+		t.Fatalf("expected env var to be TEST=1, got %v", cmd.Env)
+	}
+}
+
+func TestCommand_SetFlagConfig_DuplicateFlags(t *testing.T) {
+	t.Parallel()
+
+	flagConfig := &FlagConfig{}
+	flagConfig.General.IgnoreErrors = ptr(true)
+	flagConfig.General.AbortOnError = ptr(true)
+
+	builder := New().NoUpdate().SetFlagConfig(flagConfig)
+
+	err := builder.flagConfig.General.Validate()
+	if err == nil {
+		t.Fatal("expected validation error, got nil")
+	}
+
+	if _, ok := IsMultipleJSONParsingFlagsError(err); !ok {
+		t.Fatalf("expected validation error to be a multiple JSON parsing flags error, got %v", err)
+	}
+}
+
+func TestCommand_JSONClone(t *testing.T) {
+	t.Parallel()
+
+	builder := New().NoUpdate().IgnoreErrors().Output("test.mp4")
+
+	cloned := builder.GetFlagConfig().Clone()
+
+	if cloned.General.IgnoreErrors == nil {
+		t.Fatal("expected ignore errors to be set")
+	}
+
+	if v := cloned.Filesystem.Output; v == nil {
+		t.Fatal("expected output to be set")
+	}
+
+	if *cloned.Filesystem.Output != "test.mp4" {
+		t.Fatalf("expected output to be %q, got %q", "test.mp4", *cloned.Filesystem.Output)
+	}
+}
+
+func TestCommand_StderrFunc(t *testing.T) {
+	t.Parallel()
+
+	server := newMockServer(t, "testdata/sample-1.mp4")
+
+	dir := t.TempDir()
+
+	var mu sync.Mutex
+	var stderrLines []string
+
+	result, err := New().
+		Verbose().
+		ForceOverwrites().
+		Output(filepath.Join(dir, "%(extractor)s - %(title)s.%(ext)s")).
+		StderrFunc(func(line string) {
+			mu.Lock()
+			stderrLines = append(stderrLines, line)
+			mu.Unlock()
+		}).
+		Run(context.TODO(), server.fileURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if result.ExitCode != 0 {
+		t.Fatalf("expected exit code 0, got %d", result.ExitCode)
+	}
+
+	mu.Lock()
+	count := len(stderrLines)
+	mu.Unlock()
+
+	if count == 0 {
+		t.Fatal("expected at least one stderr line from the callback")
+	}
+
+	if result.Stderr == "" {
+		t.Fatal("expected result.Stderr to be non-empty with --verbose")
+	}
+}
+
+func TestCommand_StderrFunc_Clone(t *testing.T) {
+	t.Parallel()
+
+	called := false
+	builder := New().NoUpdate().StderrFunc(func(_ string) {
+		called = true
+	})
+
+	cloned := builder.Clone()
+
+	if cloned.stderr == nil {
+		t.Fatal("expected stderr handler to be copied by Clone()")
+	}
+
+	cloned.stderr.handle("test")
+	if !called {
+		t.Fatal("expected cloned stderr handler to invoke the original callback")
+	}
+}
+
+func TestCommand_UnsetStderrFunc(t *testing.T) {
+	t.Parallel()
+
+	builder := New().NoUpdate().StderrFunc(func(_ string) {}).UnsetStderrFunc()
+
+	if builder.stderr != nil {
+		t.Fatal("expected stderr handler to be nil after UnsetStderrFunc()")
 	}
 }

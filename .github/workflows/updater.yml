@@ -9,11 +9,11 @@ jobs:
   yt-dlp:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: lrstanley/.github/composite/go-versions@master
         id: goversion
       - name: install-go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "${{ steps.goversion.outputs.version }}"
           cache: false
@@ -40,4 +40,5 @@ jobs:
             *.gen.go
             *.gen_test.go
             optiondata/*.gen.go
+            optiondata/json-schema.json
           repo: ${{ steps.release.outputs.repo }}

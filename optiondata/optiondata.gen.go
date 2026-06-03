@@ -38,7 +38,6 @@ var (
 			optionIgnoreErrors,
 			optionNoAbortOnError,
 			optionAbortOnError,
-			optionDumpUserAgent,
 			optionListExtractors,
 			optionExtractorDescriptions,
 			optionUseExtractors,
@@ -49,6 +48,10 @@ var (
 			optionConfigLocations,
 			optionPluginDirs,
 			optionNoPluginDirs,
+			optionJsRuntimes,
+			optionNoJsRuntimes,
+			optionRemoteComponents,
+			optionNoRemoteComponents,
 			optionFlatPlaylist,
 			optionNoFlatPlaylist,
 			optionLiveFromStart,
@@ -60,6 +63,7 @@ var (
 			optionNoColors,
 			optionColor,
 			optionCompatOptions,
+			optionPresetAlias,
 		},
 	}
 	groupNetwork = &OptionGroup{
@@ -79,7 +83,6 @@ var (
 		Name: "Geo-restriction",
 		Options: []*Option{
 			optionGeoVerificationProxy,
-			optionCNVerificationProxy,
 			optionXFF,
 			optionGeoBypass,
 			optionNoGeoBypass,
@@ -118,8 +121,6 @@ var (
 			optionBreakPerInput,
 			optionNoBreakPerInput,
 			optionSkipPlaylistAfterErrors,
-			optionIncludeAds,
-			optionNoIncludeAds,
 		},
 	}
 	groupDownload = &OptionGroup{
@@ -145,7 +146,6 @@ var (
 			optionPlaylistRandom,
 			optionLazyPlaylist,
 			optionNoLazyPlaylist,
-			optionXattrSetFileSize,
 			optionHLSPreferNative,
 			optionHLSPreferFFmpeg,
 			optionHLSUseMPEGTS,
@@ -184,8 +184,6 @@ var (
 			optionNoWriteDescription,
 			optionWriteInfoJSON,
 			optionNoWriteInfoJSON,
-			optionWriteAnnotations,
-			optionNoWriteAnnotations,
 			optionWritePlaylistMetafiles,
 			optionNoWritePlaylistMetafiles,
 			optionCleanInfoJSON,
@@ -255,8 +253,6 @@ var (
 			optionDumpPages,
 			optionWritePages,
 			optionPrintTraffic,
-			optionCallHome,
-			optionNoCallHome,
 		},
 	}
 	groupWorkarounds = &OptionGroup{
@@ -360,8 +356,6 @@ var (
 			optionXattrs,
 			optionConcatPlaylist,
 			optionFixup,
-			optionPreferAVConv,
-			optionPreferFFmpeg,
 			optionFFmpegLocation,
 			optionExec,
 			optionNoExec,
@@ -387,14 +381,6 @@ var (
 			optionSponsorblockChapterTitle,
 			optionNoSponsorblock,
 			optionSponsorblockAPI,
-			optionSponskrub,
-			optionNoSponskrub,
-			optionSponskrubCut,
-			optionNoSponskrubCut,
-			optionSponskrubForce,
-			optionNoSponskrubForce,
-			optionSponskrubLocation,
-			optionSponskrubArgs,
 		},
 	}
 	groupExtractor = &OptionGroup{
@@ -406,10 +392,6 @@ var (
 			optionHLSSplitDiscontinuity,
 			optionNoHLSSplitDiscontinuity,
 			optionExtractorArgs,
-			optionYoutubeIncludeDashManifest,
-			optionYoutubeSkipDashManifest,
-			optionYoutubeIncludeHLSManifest,
-			optionYoutubeSkipHLSManifest,
 		},
 	}
 )
@@ -423,7 +405,6 @@ var Options = []*Option{
 	optionIgnoreErrors,
 	optionNoAbortOnError,
 	optionAbortOnError,
-	optionDumpUserAgent,
 	optionListExtractors,
 	optionExtractorDescriptions,
 	optionUseExtractors,
@@ -434,6 +415,10 @@ var Options = []*Option{
 	optionConfigLocations,
 	optionPluginDirs,
 	optionNoPluginDirs,
+	optionJsRuntimes,
+	optionNoJsRuntimes,
+	optionRemoteComponents,
+	optionNoRemoteComponents,
 	optionFlatPlaylist,
 	optionNoFlatPlaylist,
 	optionLiveFromStart,
@@ -445,6 +430,7 @@ var Options = []*Option{
 	optionNoColors,
 	optionColor,
 	optionCompatOptions,
+	optionPresetAlias,
 	optionProxy,
 	optionSocketTimeout,
 	optionSourceAddress,
@@ -454,7 +440,6 @@ var Options = []*Option{
 	optionForceIPv6,
 	optionEnableFileURLs,
 	optionGeoVerificationProxy,
-	optionCNVerificationProxy,
 	optionXFF,
 	optionGeoBypass,
 	optionNoGeoBypass,
@@ -488,8 +473,6 @@ var Options = []*Option{
 	optionBreakPerInput,
 	optionNoBreakPerInput,
 	optionSkipPlaylistAfterErrors,
-	optionIncludeAds,
-	optionNoIncludeAds,
 	optionConcurrentFragments,
 	optionLimitRate,
 	optionThrottledRate,
@@ -510,7 +493,6 @@ var Options = []*Option{
 	optionPlaylistRandom,
 	optionLazyPlaylist,
 	optionNoLazyPlaylist,
-	optionXattrSetFileSize,
 	optionHLSPreferNative,
 	optionHLSPreferFFmpeg,
 	optionHLSUseMPEGTS,
@@ -544,8 +526,6 @@ var Options = []*Option{
 	optionNoWriteDescription,
 	optionWriteInfoJSON,
 	optionNoWriteInfoJSON,
-	optionWriteAnnotations,
-	optionNoWriteAnnotations,
 	optionWritePlaylistMetafiles,
 	optionNoWritePlaylistMetafiles,
 	optionCleanInfoJSON,
@@ -600,8 +580,6 @@ var Options = []*Option{
 	optionDumpPages,
 	optionWritePages,
 	optionPrintTraffic,
-	optionCallHome,
-	optionNoCallHome,
 	optionEncoding,
 	optionLegacyServerConnect,
 	optionNoCheckCertificates,
@@ -680,8 +658,6 @@ var Options = []*Option{
 	optionXattrs,
 	optionConcatPlaylist,
 	optionFixup,
-	optionPreferAVConv,
-	optionPreferFFmpeg,
 	optionFFmpegLocation,
 	optionExec,
 	optionNoExec,
@@ -701,32 +677,1020 @@ var Options = []*Option{
 	optionSponsorblockChapterTitle,
 	optionNoSponsorblock,
 	optionSponsorblockAPI,
-	optionSponskrub,
-	optionNoSponskrub,
-	optionSponskrubCut,
-	optionNoSponskrubCut,
-	optionSponskrubForce,
-	optionNoSponskrubForce,
-	optionSponskrubLocation,
-	optionSponskrubArgs,
 	optionExtractorRetries,
 	optionAllowDynamicMPD,
 	optionIgnoreDynamicMPD,
 	optionHLSSplitDiscontinuity,
 	optionNoHLSSplitDiscontinuity,
 	optionExtractorArgs,
-	optionYoutubeIncludeDashManifest,
-	optionYoutubeSkipDashManifest,
-	optionYoutubeIncludeHLSManifest,
-	optionYoutubeSkipHLSManifest,
+}
+
+// FindByName finds an option by its name if found, nil otherwise.
+func FindByName(id string) *Option {
+	switch id {
+	case "version", "Version":
+		return optionVersion
+	case "update", "Update":
+		return optionUpdate
+	case "no-update", "NoUpdate", "noUpdate", "no_update":
+		return optionNoUpdate
+	case "update-to", "UpdateTo", "updateTo", "update_to":
+		return optionUpdateTo
+	case "ignore-errors", "IgnoreErrors", "ignoreErrors", "ignore_errors":
+		return optionIgnoreErrors
+	case "no-abort-on-error", "NoAbortOnError", "noAbortOnError", "no_abort_on_error":
+		return optionNoAbortOnError
+	case "abort-on-error", "AbortOnError", "abortOnError", "abort_on_error":
+		return optionAbortOnError
+	case "list-extractors", "ListExtractors", "listExtractors", "list_extractors":
+		return optionListExtractors
+	case "extractor-descriptions", "ExtractorDescriptions", "extractorDescriptions", "extractor_descriptions":
+		return optionExtractorDescriptions
+	case "use-extractors", "UseExtractors", "useExtractors", "use_extractors":
+		return optionUseExtractors
+	case "force-generic-extractor", "ForceGenericExtractor", "forceGenericExtractor", "force_generic_extractor":
+		return optionForceGenericExtractor
+	case "default-search", "DefaultSearch", "defaultSearch", "default_search":
+		return optionDefaultSearch
+	case "ignore-config", "IgnoreConfig", "ignoreConfig", "ignore_config":
+		return optionIgnoreConfig
+	case "no-config-locations", "NoConfigLocations", "noConfigLocations", "no_config_locations":
+		return optionNoConfigLocations
+	case "config-locations", "ConfigLocations", "configLocations", "config_locations":
+		return optionConfigLocations
+	case "plugin-dirs", "PluginDirs", "pluginDirs", "plugin_dirs":
+		return optionPluginDirs
+	case "no-plugin-dirs", "NoPluginDirs", "noPluginDirs", "no_plugin_dirs":
+		return optionNoPluginDirs
+	case "js-runtimes", "JsRuntimes", "jsRuntimes", "js_runtimes":
+		return optionJsRuntimes
+	case "no-js-runtimes", "NoJsRuntimes", "noJsRuntimes", "no_js_runtimes":
+		return optionNoJsRuntimes
+	case "remote-components", "RemoteComponents", "remoteComponents", "remote_components":
+		return optionRemoteComponents
+	case "no-remote-components", "NoRemoteComponents", "noRemoteComponents", "no_remote_components":
+		return optionNoRemoteComponents
+	case "flat-playlist", "FlatPlaylist", "flatPlaylist", "flat_playlist":
+		return optionFlatPlaylist
+	case "no-flat-playlist", "NoFlatPlaylist", "noFlatPlaylist", "no_flat_playlist":
+		return optionNoFlatPlaylist
+	case "live-from-start", "LiveFromStart", "liveFromStart", "live_from_start":
+		return optionLiveFromStart
+	case "no-live-from-start", "NoLiveFromStart", "noLiveFromStart", "no_live_from_start":
+		return optionNoLiveFromStart
+	case "wait-for-video", "WaitForVideo", "waitForVideo", "wait_for_video":
+		return optionWaitForVideo
+	case "no-wait-for-video", "NoWaitForVideo", "noWaitForVideo", "no_wait_for_video":
+		return optionNoWaitForVideo
+	case "mark-watched", "MarkWatched", "markWatched", "mark_watched":
+		return optionMarkWatched
+	case "no-mark-watched", "NoMarkWatched", "noMarkWatched", "no_mark_watched":
+		return optionNoMarkWatched
+	case "no-colors", "NoColors", "noColors", "no_colors":
+		return optionNoColors
+	case "color", "Color":
+		return optionColor
+	case "compat-options", "CompatOptions", "compatOptions", "compat_options":
+		return optionCompatOptions
+	case "preset-alias", "PresetAlias", "presetAlias", "preset_alias":
+		return optionPresetAlias
+	case "proxy", "Proxy":
+		return optionProxy
+	case "socket-timeout", "SocketTimeout", "socketTimeout", "socket_timeout":
+		return optionSocketTimeout
+	case "source-address", "SourceAddress", "sourceAddress", "source_address":
+		return optionSourceAddress
+	case "impersonate", "Impersonate":
+		return optionImpersonate
+	case "list-impersonate-targets", "ListImpersonateTargets", "listImpersonateTargets", "list_impersonate_targets":
+		return optionListImpersonateTargets
+	case "force-ipv4", "ForceIPv4", "forceIPv4", "force_ipv_4":
+		return optionForceIPv4
+	case "force-ipv6", "ForceIPv6", "forceIPv6", "force_ipv_6":
+		return optionForceIPv6
+	case "enable-file-urls", "EnableFileURLs", "enableFileURLs", "enable_file_urls":
+		return optionEnableFileURLs
+	case "geo-verification-proxy", "GeoVerificationProxy", "geoVerificationProxy", "geo_verification_proxy":
+		return optionGeoVerificationProxy
+	case "xff", "XFF":
+		return optionXFF
+	case "geo-bypass", "GeoBypass", "geoBypass", "geo_bypass":
+		return optionGeoBypass
+	case "no-geo-bypass", "NoGeoBypass", "noGeoBypass", "no_geo_bypass":
+		return optionNoGeoBypass
+	case "geo-bypass-country", "GeoBypassCountry", "geoBypassCountry", "geo_bypass_country":
+		return optionGeoBypassCountry
+	case "geo-bypass-ip-block", "GeoBypassIPBlock", "geoBypassIPBlock", "geo_bypass_ip_block":
+		return optionGeoBypassIPBlock
+	case "playlist-start", "PlaylistStart", "playlistStart", "playlist_start":
+		return optionPlaylistStart
+	case "playlist-end", "PlaylistEnd", "playlistEnd", "playlist_end":
+		return optionPlaylistEnd
+	case "playlist-items", "PlaylistItems", "playlistItems", "playlist_items":
+		return optionPlaylistItems
+	case "match-title", "MatchTitle", "matchTitle", "match_title":
+		return optionMatchTitle
+	case "reject-title", "RejectTitle", "rejectTitle", "reject_title":
+		return optionRejectTitle
+	case "min-filesize", "MinFileSize", "minFileSize", "min_filesize":
+		return optionMinFileSize
+	case "max-filesize", "MaxFileSize", "maxFileSize", "max_filesize":
+		return optionMaxFileSize
+	case "date", "Date":
+		return optionDate
+	case "datebefore", "DateBefore", "dateBefore":
+		return optionDateBefore
+	case "dateafter", "DateAfter", "dateAfter":
+		return optionDateAfter
+	case "min-views", "MinViews", "minViews", "min_views":
+		return optionMinViews
+	case "max-views", "MaxViews", "maxViews", "max_views":
+		return optionMaxViews
+	case "match-filters", "MatchFilters", "matchFilters", "match_filters":
+		return optionMatchFilters
+	case "no-match-filters", "NoMatchFilters", "noMatchFilters", "no_match_filters":
+		return optionNoMatchFilters
+	case "break-match-filters", "BreakMatchFilters", "breakMatchFilters", "break_match_filters":
+		return optionBreakMatchFilters
+	case "no-break-match-filters", "NoBreakMatchFilters", "noBreakMatchFilters", "no_break_match_filters":
+		return optionNoBreakMatchFilters
+	case "no-playlist", "NoPlaylist", "noPlaylist", "no_playlist":
+		return optionNoPlaylist
+	case "yes-playlist", "YesPlaylist", "yesPlaylist", "yes_playlist":
+		return optionYesPlaylist
+	case "age-limit", "AgeLimit", "ageLimit", "age_limit":
+		return optionAgeLimit
+	case "download-archive", "DownloadArchive", "downloadArchive", "download_archive":
+		return optionDownloadArchive
+	case "no-download-archive", "NoDownloadArchive", "noDownloadArchive", "no_download_archive":
+		return optionNoDownloadArchive
+	case "max-downloads", "MaxDownloads", "maxDownloads", "max_downloads":
+		return optionMaxDownloads
+	case "break-on-existing", "BreakOnExisting", "breakOnExisting", "break_on_existing":
+		return optionBreakOnExisting
+	case "no-break-on-existing", "NoBreakOnExisting", "noBreakOnExisting", "no_break_on_existing":
+		return optionNoBreakOnExisting
+	case "break-on-reject", "BreakOnReject", "breakOnReject", "break_on_reject":
+		return optionBreakOnReject
+	case "break-per-input", "BreakPerInput", "breakPerInput", "break_per_input":
+		return optionBreakPerInput
+	case "no-break-per-input", "NoBreakPerInput", "noBreakPerInput", "no_break_per_input":
+		return optionNoBreakPerInput
+	case "skip-playlist-after-errors", "SkipPlaylistAfterErrors", "skipPlaylistAfterErrors", "skip_playlist_after_errors":
+		return optionSkipPlaylistAfterErrors
+	case "concurrent-fragments", "ConcurrentFragments", "concurrentFragments", "concurrent_fragments":
+		return optionConcurrentFragments
+	case "limit-rate", "LimitRate", "limitRate", "limit_rate":
+		return optionLimitRate
+	case "throttled-rate", "ThrottledRate", "throttledRate", "throttled_rate":
+		return optionThrottledRate
+	case "retries", "Retries":
+		return optionRetries
+	case "file-access-retries", "FileAccessRetries", "fileAccessRetries", "file_access_retries":
+		return optionFileAccessRetries
+	case "fragment-retries", "FragmentRetries", "fragmentRetries", "fragment_retries":
+		return optionFragmentRetries
+	case "retry-sleep", "RetrySleep", "retrySleep", "retry_sleep":
+		return optionRetrySleep
+	case "skip-unavailable-fragments", "SkipUnavailableFragments", "skipUnavailableFragments", "skip_unavailable_fragments":
+		return optionSkipUnavailableFragments
+	case "abort-on-unavailable-fragments", "AbortOnUnavailableFragments", "abortOnUnavailableFragments", "abort_on_unavailable_fragments":
+		return optionAbortOnUnavailableFragments
+	case "keep-fragments", "KeepFragments", "keepFragments", "keep_fragments":
+		return optionKeepFragments
+	case "no-keep-fragments", "NoKeepFragments", "noKeepFragments", "no_keep_fragments":
+		return optionNoKeepFragments
+	case "buffer-size", "BufferSize", "bufferSize", "buffer_size":
+		return optionBufferSize
+	case "resize-buffer", "ResizeBuffer", "resizeBuffer", "resize_buffer":
+		return optionResizeBuffer
+	case "no-resize-buffer", "NoResizeBuffer", "noResizeBuffer", "no_resize_buffer":
+		return optionNoResizeBuffer
+	case "http-chunk-size", "HTTPChunkSize", "httpChunkSize", "http_chunk_size":
+		return optionHTTPChunkSize
+	case "playlist-reverse", "PlaylistReverse", "playlistReverse", "playlist_reverse":
+		return optionPlaylistReverse
+	case "no-playlist-reverse", "NoPlaylistReverse", "noPlaylistReverse", "no_playlist_reverse":
+		return optionNoPlaylistReverse
+	case "playlist-random", "PlaylistRandom", "playlistRandom", "playlist_random":
+		return optionPlaylistRandom
+	case "lazy-playlist", "LazyPlaylist", "lazyPlaylist", "lazy_playlist":
+		return optionLazyPlaylist
+	case "no-lazy-playlist", "NoLazyPlaylist", "noLazyPlaylist", "no_lazy_playlist":
+		return optionNoLazyPlaylist
+	case "hls-prefer-native", "HLSPreferNative", "hlsPreferNative", "hls_prefer_native":
+		return optionHLSPreferNative
+	case "hls-prefer-ffmpeg", "HLSPreferFFmpeg", "hlsPreferFFmpeg", "hls_prefer_ffmpeg":
+		return optionHLSPreferFFmpeg
+	case "hls-use-mpegts", "HLSUseMPEGTS", "hlsUseMPEGTS", "hls_use_mpegts":
+		return optionHLSUseMPEGTS
+	case "no-hls-use-mpegts", "NoHLSUseMPEGTS", "noHLSUseMPEGTS", "no_hls_use_mpegts":
+		return optionNoHLSUseMPEGTS
+	case "download-sections", "DownloadSections", "downloadSections", "download_sections":
+		return optionDownloadSections
+	case "downloader", "Downloader":
+		return optionDownloader
+	case "downloader-args", "DownloaderArgs", "downloaderArgs", "downloader_args":
+		return optionDownloaderArgs
+	case "batch-file", "BatchFile", "batchFile", "batch_file":
+		return optionBatchFile
+	case "no-batch-file", "NoBatchFile", "noBatchFile", "no_batch_file":
+		return optionNoBatchFile
+	case "id", "ID":
+		return optionID
+	case "paths", "Paths":
+		return optionPaths
+	case "output", "Output":
+		return optionOutput
+	case "output-na-placeholder", "OutputNaPlaceholder", "outputNaPlaceholder", "output_na_placeholder":
+		return optionOutputNaPlaceholder
+	case "autonumber-size", "AutoNumberSize", "autoNumberSize", "autonumber_size":
+		return optionAutoNumberSize
+	case "autonumber-start", "AutoNumberStart", "autoNumberStart", "autonumber_start":
+		return optionAutoNumberStart
+	case "restrict-filenames", "RestrictFilenames", "restrictFilenames", "restrict_filenames":
+		return optionRestrictFilenames
+	case "no-restrict-filenames", "NoRestrictFilenames", "noRestrictFilenames", "no_restrict_filenames":
+		return optionNoRestrictFilenames
+	case "windows-filenames", "WindowsFilenames", "windowsFilenames", "windows_filenames":
+		return optionWindowsFilenames
+	case "no-windows-filenames", "NoWindowsFilenames", "noWindowsFilenames", "no_windows_filenames":
+		return optionNoWindowsFilenames
+	case "trim-filenames", "TrimFilenames", "trimFilenames", "trim_filenames":
+		return optionTrimFilenames
+	case "no-overwrites", "NoOverwrites", "noOverwrites", "no_overwrites":
+		return optionNoOverwrites
+	case "force-overwrites", "ForceOverwrites", "forceOverwrites", "force_overwrites":
+		return optionForceOverwrites
+	case "no-force-overwrites", "NoForceOverwrites", "noForceOverwrites", "no_force_overwrites":
+		return optionNoForceOverwrites
+	case "continue", "Continue":
+		return optionContinue
+	case "no-continue", "NoContinue", "noContinue", "no_continue":
+		return optionNoContinue
+	case "part", "Part":
+		return optionPart
+	case "no-part", "NoPart", "noPart", "no_part":
+		return optionNoPart
+	case "mtime", "Mtime":
+		return optionMtime
+	case "no-mtime", "NoMtime", "noMtime", "no_mtime":
+		return optionNoMtime
+	case "write-description", "WriteDescription", "writeDescription", "write_description":
+		return optionWriteDescription
+	case "no-write-description", "NoWriteDescription", "noWriteDescription", "no_write_description":
+		return optionNoWriteDescription
+	case "write-info-json", "WriteInfoJSON", "writeInfoJSON", "write_info_json":
+		return optionWriteInfoJSON
+	case "no-write-info-json", "NoWriteInfoJSON", "noWriteInfoJSON", "no_write_info_json":
+		return optionNoWriteInfoJSON
+	case "write-playlist-metafiles", "WritePlaylistMetafiles", "writePlaylistMetafiles", "write_playlist_metafiles":
+		return optionWritePlaylistMetafiles
+	case "no-write-playlist-metafiles", "NoWritePlaylistMetafiles", "noWritePlaylistMetafiles", "no_write_playlist_metafiles":
+		return optionNoWritePlaylistMetafiles
+	case "clean-info-json", "CleanInfoJSON", "cleanInfoJSON", "clean_info_json":
+		return optionCleanInfoJSON
+	case "no-clean-info-json", "NoCleanInfoJSON", "noCleanInfoJSON", "no_clean_info_json":
+		return optionNoCleanInfoJSON
+	case "write-comments", "WriteComments", "writeComments", "write_comments":
+		return optionWriteComments
+	case "no-write-comments", "NoWriteComments", "noWriteComments", "no_write_comments":
+		return optionNoWriteComments
+	case "load-info-json", "LoadInfoJSON", "loadInfoJSON", "load_info_json":
+		return optionLoadInfoJSON
+	case "cookies", "Cookies":
+		return optionCookies
+	case "no-cookies", "NoCookies", "noCookies", "no_cookies":
+		return optionNoCookies
+	case "cookies-from-browser", "CookiesFromBrowser", "cookiesFromBrowser", "cookies_from_browser":
+		return optionCookiesFromBrowser
+	case "no-cookies-from-browser", "NoCookiesFromBrowser", "noCookiesFromBrowser", "no_cookies_from_browser":
+		return optionNoCookiesFromBrowser
+	case "cache-dir", "CacheDir", "cacheDir", "cache_dir":
+		return optionCacheDir
+	case "no-cache-dir", "NoCacheDir", "noCacheDir", "no_cache_dir":
+		return optionNoCacheDir
+	case "rm-cache-dir", "RmCacheDir", "rmCacheDir", "rm_cache_dir":
+		return optionRmCacheDir
+	case "write-thumbnail", "WriteThumbnail", "writeThumbnail", "write_thumbnail":
+		return optionWriteThumbnail
+	case "no-write-thumbnail", "NoWriteThumbnail", "noWriteThumbnail", "no_write_thumbnail":
+		return optionNoWriteThumbnail
+	case "write-all-thumbnails", "WriteAllThumbnails", "writeAllThumbnails", "write_all_thumbnails":
+		return optionWriteAllThumbnails
+	case "list-thumbnails", "ListThumbnails", "listThumbnails", "list_thumbnails":
+		return optionListThumbnails
+	case "write-link", "WriteLink", "writeLink", "write_link":
+		return optionWriteLink
+	case "write-url-link", "WriteURLLink", "writeURLLink", "write_url_link":
+		return optionWriteURLLink
+	case "write-webloc-link", "WriteWeblocLink", "writeWeblocLink", "write_webloc_link":
+		return optionWriteWeblocLink
+	case "write-desktop-link", "WriteDesktopLink", "writeDesktopLink", "write_desktop_link":
+		return optionWriteDesktopLink
+	case "quiet", "Quiet":
+		return optionQuiet
+	case "no-quiet", "NoQuiet", "noQuiet", "no_quiet":
+		return optionNoQuiet
+	case "no-warnings", "NoWarnings", "noWarnings", "no_warnings":
+		return optionNoWarnings
+	case "simulate", "Simulate":
+		return optionSimulate
+	case "no-simulate", "NoSimulate", "noSimulate", "no_simulate":
+		return optionNoSimulate
+	case "ignore-no-formats-error", "IgnoreNoFormatsError", "ignoreNoFormatsError", "ignore_no_formats_error":
+		return optionIgnoreNoFormatsError
+	case "no-ignore-no-formats-error", "NoIgnoreNoFormatsError", "noIgnoreNoFormatsError", "no_ignore_no_formats_error":
+		return optionNoIgnoreNoFormatsError
+	case "skip-download", "SkipDownload", "skipDownload", "skip_download":
+		return optionSkipDownload
+	case "print", "Print":
+		return optionPrint
+	case "print-to-file", "PrintToFile", "printToFile", "print_to_file":
+		return optionPrintToFile
+	case "get-url", "GetURL", "getURL", "get_url":
+		return optionGetURL
+	case "get-title", "GetTitle", "getTitle", "get_title":
+		return optionGetTitle
+	case "get-id", "GetID", "getID", "get_id":
+		return optionGetID
+	case "get-thumbnail", "GetThumbnail", "getThumbnail", "get_thumbnail":
+		return optionGetThumbnail
+	case "get-description", "GetDescription", "getDescription", "get_description":
+		return optionGetDescription
+	case "get-duration", "GetDuration", "getDuration", "get_duration":
+		return optionGetDuration
+	case "get-filename", "GetFilename", "getFilename", "get_filename":
+		return optionGetFilename
+	case "get-format", "GetFormat", "getFormat", "get_format":
+		return optionGetFormat
+	case "dump-json", "DumpJSON", "dumpJSON", "dump_json":
+		return optionDumpJSON
+	case "dump-single-json", "DumpSingleJSON", "dumpSingleJSON", "dump_single_json":
+		return optionDumpSingleJSON
+	case "print-json", "PrintJSON", "printJSON", "print_json":
+		return optionPrintJSON
+	case "force-write-archive", "ForceWriteArchive", "forceWriteArchive", "force_write_archive":
+		return optionForceWriteArchive
+	case "newline", "Newline":
+		return optionNewline
+	case "no-progress", "NoProgress", "noProgress", "no_progress":
+		return optionNoProgress
+	case "progress", "Progress":
+		return optionProgress
+	case "console-title", "ConsoleTitle", "consoleTitle", "console_title":
+		return optionConsoleTitle
+	case "progress-template", "ProgressTemplate", "progressTemplate", "progress_template":
+		return optionProgressTemplate
+	case "progress-delta", "ProgressDelta", "progressDelta", "progress_delta":
+		return optionProgressDelta
+	case "verbose", "Verbose":
+		return optionVerbose
+	case "dump-pages", "DumpPages", "dumpPages", "dump_pages":
+		return optionDumpPages
+	case "write-pages", "WritePages", "writePages", "write_pages":
+		return optionWritePages
+	case "print-traffic", "PrintTraffic", "printTraffic", "print_traffic":
+		return optionPrintTraffic
+	case "encoding", "Encoding":
+		return optionEncoding
+	case "legacy-server-connect", "LegacyServerConnect", "legacyServerConnect", "legacy_server_connect":
+		return optionLegacyServerConnect
+	case "no-check-certificates", "NoCheckCertificates", "noCheckCertificates", "no_check_certificates":
+		return optionNoCheckCertificates
+	case "prefer-insecure", "PreferInsecure", "preferInsecure", "prefer_insecure":
+		return optionPreferInsecure
+	case "user-agent", "UserAgent", "userAgent", "user_agent":
+		return optionUserAgent
+	case "referer", "Referer":
+		return optionReferer
+	case "add-headers", "AddHeaders", "addHeaders", "add_headers":
+		return optionAddHeaders
+	case "bidi-workaround", "BidiWorkaround", "bidiWorkaround", "bidi_workaround":
+		return optionBidiWorkaround
+	case "sleep-requests", "SleepRequests", "sleepRequests", "sleep_requests":
+		return optionSleepRequests
+	case "sleep-interval", "SleepInterval", "sleepInterval", "sleep_interval":
+		return optionSleepInterval
+	case "max-sleep-interval", "MaxSleepInterval", "maxSleepInterval", "max_sleep_interval":
+		return optionMaxSleepInterval
+	case "sleep-subtitles", "SleepSubtitles", "sleepSubtitles", "sleep_subtitles":
+		return optionSleepSubtitles
+	case "format", "Format":
+		return optionFormat
+	case "format-sort", "FormatSort", "formatSort", "format_sort":
+		return optionFormatSort
+	case "format-sort-force", "FormatSortForce", "formatSortForce", "format_sort_force":
+		return optionFormatSortForce
+	case "no-format-sort-force", "NoFormatSortForce", "noFormatSortForce", "no_format_sort_force":
+		return optionNoFormatSortForce
+	case "video-multistreams", "VideoMultistreams", "videoMultistreams", "video_multistreams":
+		return optionVideoMultistreams
+	case "no-video-multistreams", "NoVideoMultistreams", "noVideoMultistreams", "no_video_multistreams":
+		return optionNoVideoMultistreams
+	case "audio-multistreams", "AudioMultistreams", "audioMultistreams", "audio_multistreams":
+		return optionAudioMultistreams
+	case "no-audio-multistreams", "NoAudioMultistreams", "noAudioMultistreams", "no_audio_multistreams":
+		return optionNoAudioMultistreams
+	case "all-formats", "AllFormats", "allFormats", "all_formats":
+		return optionAllFormats
+	case "prefer-free-formats", "PreferFreeFormats", "preferFreeFormats", "prefer_free_formats":
+		return optionPreferFreeFormats
+	case "no-prefer-free-formats", "NoPreferFreeFormats", "noPreferFreeFormats", "no_prefer_free_formats":
+		return optionNoPreferFreeFormats
+	case "check-formats", "CheckFormats", "checkFormats", "check_formats":
+		return optionCheckFormats
+	case "check-all-formats", "CheckAllFormats", "checkAllFormats", "check_all_formats":
+		return optionCheckAllFormats
+	case "no-check-formats", "NoCheckFormats", "noCheckFormats", "no_check_formats":
+		return optionNoCheckFormats
+	case "list-formats", "ListFormats", "listFormats", "list_formats":
+		return optionListFormats
+	case "list-formats-as-table", "ListFormatsAsTable", "listFormatsAsTable", "list_formats_as_table":
+		return optionListFormatsAsTable
+	case "list-formats-old", "ListFormatsOld", "listFormatsOld", "list_formats_old":
+		return optionListFormatsOld
+	case "merge-output-format", "MergeOutputFormat", "mergeOutputFormat", "merge_output_format":
+		return optionMergeOutputFormat
+	case "write-subs", "WriteSubs", "writeSubs", "write_subs":
+		return optionWriteSubs
+	case "no-write-subs", "NoWriteSubs", "noWriteSubs", "no_write_subs":
+		return optionNoWriteSubs
+	case "write-auto-subs", "WriteAutoSubs", "writeAutoSubs", "write_auto_subs":
+		return optionWriteAutoSubs
+	case "no-write-auto-subs", "NoWriteAutoSubs", "noWriteAutoSubs", "no_write_auto_subs":
+		return optionNoWriteAutoSubs
+	case "all-subs", "AllSubs", "allSubs", "all_subs":
+		return optionAllSubs
+	case "list-subs", "ListSubs", "listSubs", "list_subs":
+		return optionListSubs
+	case "sub-format", "SubFormat", "subFormat", "sub_format":
+		return optionSubFormat
+	case "sub-langs", "SubLangs", "subLangs", "sub_langs":
+		return optionSubLangs
+	case "username", "Username":
+		return optionUsername
+	case "password", "Password":
+		return optionPassword
+	case "twofactor", "TwoFactor", "twoFactor":
+		return optionTwoFactor
+	case "netrc", "Netrc":
+		return optionNetrc
+	case "netrc-location", "NetrcLocation", "netrcLocation", "netrc_location":
+		return optionNetrcLocation
+	case "netrc-cmd", "NetrcCmd", "netrcCmd", "netrc_cmd":
+		return optionNetrcCmd
+	case "video-password", "VideoPassword", "videoPassword", "video_password":
+		return optionVideoPassword
+	case "ap-mso", "ApMSO", "apMSO", "ap_mso":
+		return optionApMSO
+	case "ap-username", "ApUsername", "apUsername", "ap_username":
+		return optionApUsername
+	case "ap-password", "ApPassword", "apPassword", "ap_password":
+		return optionApPassword
+	case "ap-list-mso", "ApListMSO", "apListMSO", "ap_list_mso":
+		return optionApListMSO
+	case "client-certificate", "ClientCertificate", "clientCertificate", "client_certificate":
+		return optionClientCertificate
+	case "client-certificate-key", "ClientCertificateKey", "clientCertificateKey", "client_certificate_key":
+		return optionClientCertificateKey
+	case "client-certificate-password", "ClientCertificatePassword", "clientCertificatePassword", "client_certificate_password":
+		return optionClientCertificatePassword
+	case "extract-audio", "ExtractAudio", "extractAudio", "extract_audio":
+		return optionExtractAudio
+	case "audio-format", "AudioFormat", "audioFormat", "audio_format":
+		return optionAudioFormat
+	case "audio-quality", "AudioQuality", "audioQuality", "audio_quality":
+		return optionAudioQuality
+	case "remux-video", "RemuxVideo", "remuxVideo", "remux_video":
+		return optionRemuxVideo
+	case "recode-video", "RecodeVideo", "recodeVideo", "recode_video":
+		return optionRecodeVideo
+	case "postprocessor-args", "PostProcessorArgs", "postProcessorArgs", "postprocessor_args":
+		return optionPostProcessorArgs
+	case "keep-video", "KeepVideo", "keepVideo", "keep_video":
+		return optionKeepVideo
+	case "no-keep-video", "NoKeepVideo", "noKeepVideo", "no_keep_video":
+		return optionNoKeepVideo
+	case "post-overwrites", "PostOverwrites", "postOverwrites", "post_overwrites":
+		return optionPostOverwrites
+	case "no-post-overwrites", "NoPostOverwrites", "noPostOverwrites", "no_post_overwrites":
+		return optionNoPostOverwrites
+	case "embed-subs", "EmbedSubs", "embedSubs", "embed_subs":
+		return optionEmbedSubs
+	case "no-embed-subs", "NoEmbedSubs", "noEmbedSubs", "no_embed_subs":
+		return optionNoEmbedSubs
+	case "embed-thumbnail", "EmbedThumbnail", "embedThumbnail", "embed_thumbnail":
+		return optionEmbedThumbnail
+	case "no-embed-thumbnail", "NoEmbedThumbnail", "noEmbedThumbnail", "no_embed_thumbnail":
+		return optionNoEmbedThumbnail
+	case "embed-metadata", "EmbedMetadata", "embedMetadata", "embed_metadata":
+		return optionEmbedMetadata
+	case "no-embed-metadata", "NoEmbedMetadata", "noEmbedMetadata", "no_embed_metadata":
+		return optionNoEmbedMetadata
+	case "embed-chapters", "EmbedChapters", "embedChapters", "embed_chapters":
+		return optionEmbedChapters
+	case "no-embed-chapters", "NoEmbedChapters", "noEmbedChapters", "no_embed_chapters":
+		return optionNoEmbedChapters
+	case "embed-info-json", "EmbedInfoJSON", "embedInfoJSON", "embed_info_json":
+		return optionEmbedInfoJSON
+	case "no-embed-info-json", "NoEmbedInfoJSON", "noEmbedInfoJSON", "no_embed_info_json":
+		return optionNoEmbedInfoJSON
+	case "metadata-from-title", "MetadataFromTitle", "metadataFromTitle", "metadata_from_title":
+		return optionMetadataFromTitle
+	case "parse-metadata", "ParseMetadata", "parseMetadata", "parse_metadata":
+		return optionParseMetadata
+	case "replace-in-metadata", "ReplaceInMetadata", "replaceInMetadata", "replace_in_metadata":
+		return optionReplaceInMetadata
+	case "xattrs", "Xattrs":
+		return optionXattrs
+	case "concat-playlist", "ConcatPlaylist", "concatPlaylist", "concat_playlist":
+		return optionConcatPlaylist
+	case "fixup", "Fixup":
+		return optionFixup
+	case "ffmpeg-location", "FFmpegLocation", "ffmpegLocation", "ffmpeg_location":
+		return optionFFmpegLocation
+	case "exec", "Exec":
+		return optionExec
+	case "no-exec", "NoExec", "noExec", "no_exec":
+		return optionNoExec
+	case "exec-before-download", "ExecBeforeDownload", "execBeforeDownload", "exec_before_download":
+		return optionExecBeforeDownload
+	case "no-exec-before-download", "NoExecBeforeDownload", "noExecBeforeDownload", "no_exec_before_download":
+		return optionNoExecBeforeDownload
+	case "convert-subs", "ConvertSubs", "convertSubs", "convert_subs":
+		return optionConvertSubs
+	case "convert-thumbnails", "ConvertThumbnails", "convertThumbnails", "convert_thumbnails":
+		return optionConvertThumbnails
+	case "split-chapters", "SplitChapters", "splitChapters", "split_chapters":
+		return optionSplitChapters
+	case "no-split-chapters", "NoSplitChapters", "noSplitChapters", "no_split_chapters":
+		return optionNoSplitChapters
+	case "remove-chapters", "RemoveChapters", "removeChapters", "remove_chapters":
+		return optionRemoveChapters
+	case "no-remove-chapters", "NoRemoveChapters", "noRemoveChapters", "no_remove_chapters":
+		return optionNoRemoveChapters
+	case "force-keyframes-at-cuts", "ForceKeyframesAtCuts", "forceKeyframesAtCuts", "force_keyframes_at_cuts":
+		return optionForceKeyframesAtCuts
+	case "no-force-keyframes-at-cuts", "NoForceKeyframesAtCuts", "noForceKeyframesAtCuts", "no_force_keyframes_at_cuts":
+		return optionNoForceKeyframesAtCuts
+	case "use-postprocessor", "UsePostProcessor", "usePostProcessor", "use_postprocessor":
+		return optionUsePostProcessor
+	case "sponsorblock-mark", "SponsorblockMark", "sponsorblockMark", "sponsorblock_mark":
+		return optionSponsorblockMark
+	case "sponsorblock-remove", "SponsorblockRemove", "sponsorblockRemove", "sponsorblock_remove":
+		return optionSponsorblockRemove
+	case "sponsorblock-chapter-title", "SponsorblockChapterTitle", "sponsorblockChapterTitle", "sponsorblock_chapter_title":
+		return optionSponsorblockChapterTitle
+	case "no-sponsorblock", "NoSponsorblock", "noSponsorblock", "no_sponsorblock":
+		return optionNoSponsorblock
+	case "sponsorblock-api", "SponsorblockAPI", "sponsorblockAPI", "sponsorblock_api":
+		return optionSponsorblockAPI
+	case "extractor-retries", "ExtractorRetries", "extractorRetries", "extractor_retries":
+		return optionExtractorRetries
+	case "allow-dynamic-mpd", "AllowDynamicMPD", "allowDynamicMPD", "allow_dynamic_mpd":
+		return optionAllowDynamicMPD
+	case "ignore-dynamic-mpd", "IgnoreDynamicMPD", "ignoreDynamicMPD", "ignore_dynamic_mpd":
+		return optionIgnoreDynamicMPD
+	case "hls-split-discontinuity", "HLSSplitDiscontinuity", "hlsSplitDiscontinuity", "hls_split_discontinuity":
+		return optionHLSSplitDiscontinuity
+	case "no-hls-split-discontinuity", "NoHLSSplitDiscontinuity", "noHLSSplitDiscontinuity", "no_hls_split_discontinuity":
+		return optionNoHLSSplitDiscontinuity
+	case "extractor-args", "ExtractorArgs", "extractorArgs", "extractor_args":
+		return optionExtractorArgs
+	default:
+		return nil
+	}
+}
+
+// FindByID finds options by their ID if found, nil otherwise.
+func FindByID(id string) (options []*Option) {
+	switch id {
+	case "add_postprocessors":
+		return []*Option{optionUsePostProcessor}
+	case "addchapters":
+		return []*Option{optionEmbedChapters, optionNoEmbedChapters}
+	case "addmetadata":
+		return []*Option{optionEmbedMetadata, optionNoEmbedMetadata}
+	case "age_limit":
+		return []*Option{optionAgeLimit}
+	case "allow_multiple_audio_streams":
+		return []*Option{optionAudioMultistreams, optionNoAudioMultistreams}
+	case "allow_multiple_video_streams":
+		return []*Option{optionVideoMultistreams, optionNoVideoMultistreams}
+	case "allow_playlist_files":
+		return []*Option{optionWritePlaylistMetafiles, optionNoWritePlaylistMetafiles}
+	case "allowed_extractors":
+		return []*Option{optionUseExtractors}
+	case "allsubtitles":
+		return []*Option{optionAllSubs}
+	case "ap_list_mso":
+		return []*Option{optionApListMSO}
+	case "ap_mso":
+		return []*Option{optionApMSO}
+	case "ap_password":
+		return []*Option{optionApPassword}
+	case "ap_username":
+		return []*Option{optionApUsername}
+	case "audioformat":
+		return []*Option{optionAudioFormat}
+	case "audioquality":
+		return []*Option{optionAudioQuality}
+	case "autonumber_size":
+		return []*Option{optionAutoNumberSize}
+	case "autonumber_start":
+		return []*Option{optionAutoNumberStart}
+	case "batchfile":
+		return []*Option{optionBatchFile, optionNoBatchFile}
+	case "bidi_workaround":
+		return []*Option{optionBidiWorkaround}
+	case "break_on_existing":
+		return []*Option{optionBreakOnExisting, optionNoBreakOnExisting}
+	case "break_on_reject":
+		return []*Option{optionBreakOnReject}
+	case "break_per_url":
+		return []*Option{optionBreakPerInput, optionNoBreakPerInput}
+	case "breaking_match_filter":
+		return []*Option{optionBreakMatchFilters, optionNoBreakMatchFilters}
+	case "buffersize":
+		return []*Option{optionBufferSize}
+	case "cachedir":
+		return []*Option{optionCacheDir, optionNoCacheDir}
+	case "check_formats":
+		return []*Option{optionCheckFormats, optionCheckAllFormats, optionNoCheckFormats}
+	case "clean_infojson":
+		return []*Option{optionCleanInfoJSON, optionNoCleanInfoJSON}
+	case "client_certificate":
+		return []*Option{optionClientCertificate}
+	case "client_certificate_key":
+		return []*Option{optionClientCertificateKey}
+	case "client_certificate_password":
+		return []*Option{optionClientCertificatePassword}
+	case "color":
+		return []*Option{optionNoColors, optionColor}
+	case "compat_opts":
+		return []*Option{optionCompatOptions}
+	case "concat_playlist":
+		return []*Option{optionConcatPlaylist}
+	case "concurrent_fragment_downloads":
+		return []*Option{optionConcurrentFragments}
+	case "config_locations":
+		return []*Option{optionNoConfigLocations, optionConfigLocations}
+	case "consoletitle":
+		return []*Option{optionConsoleTitle}
+	case "continue_dl":
+		return []*Option{optionContinue, optionNoContinue}
+	case "convertsubtitles":
+		return []*Option{optionConvertSubs}
+	case "convertthumbnails":
+		return []*Option{optionConvertThumbnails}
+	case "cookiefile":
+		return []*Option{optionCookies, optionNoCookies}
+	case "cookiesfrombrowser":
+		return []*Option{optionCookiesFromBrowser, optionNoCookiesFromBrowser}
+	case "date":
+		return []*Option{optionDate}
+	case "dateafter":
+		return []*Option{optionDateAfter}
+	case "datebefore":
+		return []*Option{optionDateBefore}
+	case "debug_printtraffic":
+		return []*Option{optionPrintTraffic}
+	case "default_search":
+		return []*Option{optionDefaultSearch}
+	case "download_archive":
+		return []*Option{optionDownloadArchive, optionNoDownloadArchive}
+	case "download_ranges":
+		return []*Option{optionDownloadSections}
+	case "dump_intermediate_pages":
+		return []*Option{optionDumpPages}
+	case "dump_single_json":
+		return []*Option{optionDumpSingleJSON}
+	case "dumpjson":
+		return []*Option{optionDumpJSON}
+	case "dynamic_mpd":
+		return []*Option{optionAllowDynamicMPD, optionIgnoreDynamicMPD}
+	case "embed_infojson":
+		return []*Option{optionEmbedInfoJSON, optionNoEmbedInfoJSON}
+	case "embedsubtitles":
+		return []*Option{optionEmbedSubs, optionNoEmbedSubs}
+	case "embedthumbnail":
+		return []*Option{optionEmbedThumbnail, optionNoEmbedThumbnail}
+	case "enable_file_urls":
+		return []*Option{optionEnableFileURLs}
+	case "encoding":
+		return []*Option{optionEncoding}
+	case "exec_before_dl_cmd":
+		return []*Option{optionExecBeforeDownload, optionNoExecBeforeDownload}
+	case "exec_cmd":
+		return []*Option{optionExec, optionNoExec}
+	case "external_downloader":
+		return []*Option{optionDownloader}
+	case "external_downloader_args":
+		return []*Option{optionDownloaderArgs}
+	case "extract_flat":
+		return []*Option{optionFlatPlaylist, optionNoFlatPlaylist}
+	case "extractaudio":
+		return []*Option{optionExtractAudio}
+	case "extractor_args":
+		return []*Option{optionExtractorArgs}
+	case "extractor_retries":
+		return []*Option{optionExtractorRetries}
+	case "ffmpeg_location":
+		return []*Option{optionFFmpegLocation}
+	case "file_access_retries":
+		return []*Option{optionFileAccessRetries}
+	case "fixup":
+		return []*Option{optionFixup}
+	case "force_generic_extractor":
+		return []*Option{optionForceGenericExtractor}
+	case "force_keyframes_at_cuts":
+		return []*Option{optionForceKeyframesAtCuts, optionNoForceKeyframesAtCuts}
+	case "force_write_download_archive":
+		return []*Option{optionForceWriteArchive}
+	case "forceprint":
+		return []*Option{optionPrint}
+	case "format":
+		return []*Option{optionFormat, optionAllFormats}
+	case "format_sort":
+		return []*Option{optionFormatSort}
+	case "format_sort_force":
+		return []*Option{optionFormatSortForce, optionNoFormatSortForce}
+	case "fragment_retries":
+		return []*Option{optionFragmentRetries}
+	case "geo_bypass":
+		return []*Option{optionXFF, optionGeoBypass, optionNoGeoBypass, optionGeoBypassCountry, optionGeoBypassIPBlock}
+	case "geo_verification_proxy":
+		return []*Option{optionGeoVerificationProxy}
+	case "getcomments":
+		return []*Option{optionWriteComments, optionNoWriteComments}
+	case "getdescription":
+		return []*Option{optionGetDescription}
+	case "getduration":
+		return []*Option{optionGetDuration}
+	case "getfilename":
+		return []*Option{optionGetFilename}
+	case "getformat":
+		return []*Option{optionGetFormat}
+	case "getid":
+		return []*Option{optionGetID}
+	case "getthumbnail":
+		return []*Option{optionGetThumbnail}
+	case "gettitle":
+		return []*Option{optionGetTitle}
+	case "geturl":
+		return []*Option{optionGetURL}
+	case "headers":
+		return []*Option{optionAddHeaders}
+	case "hls_prefer_native":
+		return []*Option{optionHLSPreferNative, optionHLSPreferFFmpeg}
+	case "hls_split_discontinuity":
+		return []*Option{optionHLSSplitDiscontinuity, optionNoHLSSplitDiscontinuity}
+	case "hls_use_mpegts":
+		return []*Option{optionHLSUseMPEGTS, optionNoHLSUseMPEGTS}
+	case "http_chunk_size":
+		return []*Option{optionHTTPChunkSize}
+	case "ignore_no_formats_error":
+		return []*Option{optionIgnoreNoFormatsError, optionNoIgnoreNoFormatsError}
+	case "ignoreconfig":
+		return []*Option{optionIgnoreConfig}
+	case "ignoreerrors":
+		return []*Option{optionIgnoreErrors, optionNoAbortOnError, optionAbortOnError}
+	case "impersonate":
+		return []*Option{optionImpersonate}
+	case "js_runtimes":
+		return []*Option{optionJsRuntimes, optionNoJsRuntimes}
+	case "keep_fragments":
+		return []*Option{optionKeepFragments, optionNoKeepFragments}
+	case "keepvideo":
+		return []*Option{optionKeepVideo, optionNoKeepVideo}
+	case "lazy_playlist":
+		return []*Option{optionLazyPlaylist, optionNoLazyPlaylist}
+	case "legacy_server_connect":
+		return []*Option{optionLegacyServerConnect}
+	case "list_extractor_descriptions":
+		return []*Option{optionExtractorDescriptions}
+	case "list_extractors":
+		return []*Option{optionListExtractors}
+	case "list_impersonate_targets":
+		return []*Option{optionListImpersonateTargets}
+	case "list_thumbnails":
+		return []*Option{optionListThumbnails}
+	case "listformats":
+		return []*Option{optionListFormats}
+	case "listformats_table":
+		return []*Option{optionListFormatsAsTable, optionListFormatsOld}
+	case "listsubtitles":
+		return []*Option{optionListSubs}
+	case "live_from_start":
+		return []*Option{optionLiveFromStart, optionNoLiveFromStart}
+	case "load_info_filename":
+		return []*Option{optionLoadInfoJSON}
+	case "mark_watched":
+		return []*Option{optionMarkWatched, optionNoMarkWatched}
+	case "match_filter":
+		return []*Option{optionMatchFilters, optionNoMatchFilters}
+	case "matchtitle":
+		return []*Option{optionMatchTitle}
+	case "max_downloads":
+		return []*Option{optionMaxDownloads}
+	case "max_filesize":
+		return []*Option{optionMaxFileSize}
+	case "max_sleep_interval":
+		return []*Option{optionMaxSleepInterval}
+	case "max_views":
+		return []*Option{optionMaxViews}
+	case "merge_output_format":
+		return []*Option{optionMergeOutputFormat}
+	case "metafromtitle":
+		return []*Option{optionMetadataFromTitle}
+	case "min_filesize":
+		return []*Option{optionMinFileSize}
+	case "min_views":
+		return []*Option{optionMinViews}
+	case "netrc_cmd":
+		return []*Option{optionNetrcCmd}
+	case "netrc_location":
+		return []*Option{optionNetrcLocation}
+	case "no_check_certificate":
+		return []*Option{optionNoCheckCertificates}
+	case "no_sponsorblock":
+		return []*Option{optionNoSponsorblock}
+	case "no_warnings":
+		return []*Option{optionNoWarnings}
+	case "nopart":
+		return []*Option{optionPart, optionNoPart}
+	case "noplaylist":
+		return []*Option{optionNoPlaylist, optionYesPlaylist}
+	case "nopostoverwrites":
+		return []*Option{optionPostOverwrites, optionNoPostOverwrites}
+	case "noprogress":
+		return []*Option{optionNoProgress, optionProgress}
+	case "noresizebuffer":
+		return []*Option{optionResizeBuffer, optionNoResizeBuffer}
+	case "outtmpl":
+		return []*Option{optionOutput}
+	case "outtmpl_na_placeholder":
+		return []*Option{optionOutputNaPlaceholder}
+	case "overwrites":
+		return []*Option{optionNoOverwrites, optionForceOverwrites, optionNoForceOverwrites}
+	case "parse_metadata":
+		return []*Option{optionParseMetadata, optionReplaceInMetadata}
+	case "password":
+		return []*Option{optionPassword}
+	case "paths":
+		return []*Option{optionPaths}
+	case "playlist_items":
+		return []*Option{optionPlaylistItems}
+	case "playlist_random":
+		return []*Option{optionPlaylistRandom}
+	case "playlist_reverse":
+		return []*Option{optionPlaylistReverse, optionNoPlaylistReverse}
+	case "playlistend":
+		return []*Option{optionPlaylistEnd}
+	case "playliststart":
+		return []*Option{optionPlaylistStart}
+	case "plugin_dirs":
+		return []*Option{optionPluginDirs, optionNoPluginDirs}
+	case "postprocessor_args":
+		return []*Option{optionPostProcessorArgs}
+	case "prefer_free_formats":
+		return []*Option{optionPreferFreeFormats, optionNoPreferFreeFormats}
+	case "prefer_insecure":
+		return []*Option{optionPreferInsecure}
+	case "preset-alias":
+		return []*Option{optionPresetAlias}
+	case "print_json":
+		return []*Option{optionPrintJSON}
+	case "print_to_file":
+		return []*Option{optionPrintToFile}
+	case "progress_delta":
+		return []*Option{optionProgressDelta}
+	case "progress_template":
+		return []*Option{optionProgressTemplate}
+	case "progress_with_newline":
+		return []*Option{optionNewline}
+	case "proxy":
+		return []*Option{optionProxy}
+	case "quiet":
+		return []*Option{optionQuiet, optionNoQuiet}
+	case "ratelimit":
+		return []*Option{optionLimitRate}
+	case "recodevideo":
+		return []*Option{optionRecodeVideo}
+	case "referer":
+		return []*Option{optionReferer}
+	case "rejecttitle":
+		return []*Option{optionRejectTitle}
+	case "remote_components":
+		return []*Option{optionRemoteComponents, optionNoRemoteComponents}
+	case "remove_chapters":
+		return []*Option{optionRemoveChapters, optionNoRemoveChapters}
+	case "remuxvideo":
+		return []*Option{optionRemuxVideo}
+	case "restrictfilenames":
+		return []*Option{optionRestrictFilenames, optionNoRestrictFilenames}
+	case "retries":
+		return []*Option{optionRetries}
+	case "retry_sleep":
+		return []*Option{optionRetrySleep}
+	case "rm_cachedir":
+		return []*Option{optionRmCacheDir}
+	case "simulate":
+		return []*Option{optionSimulate, optionNoSimulate}
+	case "skip_download":
+		return []*Option{optionSkipDownload}
+	case "skip_playlist_after_errors":
+		return []*Option{optionSkipPlaylistAfterErrors}
+	case "skip_unavailable_fragments":
+		return []*Option{optionSkipUnavailableFragments, optionAbortOnUnavailableFragments}
+	case "sleep_interval":
+		return []*Option{optionSleepInterval}
+	case "sleep_interval_requests":
+		return []*Option{optionSleepRequests}
+	case "sleep_interval_subtitles":
+		return []*Option{optionSleepSubtitles}
+	case "socket_timeout":
+		return []*Option{optionSocketTimeout}
+	case "source_address":
+		return []*Option{optionSourceAddress, optionForceIPv4, optionForceIPv6}
+	case "split_chapters":
+		return []*Option{optionSplitChapters, optionNoSplitChapters}
+	case "sponsorblock_api":
+		return []*Option{optionSponsorblockAPI}
+	case "sponsorblock_chapter_title":
+		return []*Option{optionSponsorblockChapterTitle}
+	case "sponsorblock_mark":
+		return []*Option{optionSponsorblockMark}
+	case "sponsorblock_remove":
+		return []*Option{optionSponsorblockRemove}
+	case "subtitlesformat":
+		return []*Option{optionSubFormat}
+	case "subtitleslangs":
+		return []*Option{optionSubLangs}
+	case "throttledratelimit":
+		return []*Option{optionThrottledRate}
+	case "trim_file_name":
+		return []*Option{optionTrimFilenames}
+	case "twofactor":
+		return []*Option{optionTwoFactor}
+	case "update_self":
+		return []*Option{optionUpdate, optionNoUpdate, optionUpdateTo}
+	case "updatetime":
+		return []*Option{optionMtime, optionNoMtime}
+	case "useid":
+		return []*Option{optionID}
+	case "usenetrc":
+		return []*Option{optionNetrc}
+	case "user_agent":
+		return []*Option{optionUserAgent}
+	case "username":
+		return []*Option{optionUsername}
+	case "verbose":
+		return []*Option{optionVerbose}
+	case "version":
+		return []*Option{optionVersion}
+	case "videopassword":
+		return []*Option{optionVideoPassword}
+	case "wait_for_video":
+		return []*Option{optionWaitForVideo, optionNoWaitForVideo}
+	case "windowsfilenames":
+		return []*Option{optionWindowsFilenames, optionNoWindowsFilenames}
+	case "write_pages":
+		return []*Option{optionWritePages}
+	case "writeautomaticsub":
+		return []*Option{optionWriteAutoSubs, optionNoWriteAutoSubs}
+	case "writedescription":
+		return []*Option{optionWriteDescription, optionNoWriteDescription}
+	case "writedesktoplink":
+		return []*Option{optionWriteDesktopLink}
+	case "writeinfojson":
+		return []*Option{optionWriteInfoJSON, optionNoWriteInfoJSON}
+	case "writelink":
+		return []*Option{optionWriteLink}
+	case "writesubtitles":
+		return []*Option{optionWriteSubs, optionNoWriteSubs}
+	case "writethumbnail":
+		return []*Option{optionWriteThumbnail, optionNoWriteThumbnail, optionWriteAllThumbnails}
+	case "writeurllink":
+		return []*Option{optionWriteURLLink}
+	case "writewebloclink":
+		return []*Option{optionWriteWeblocLink}
+	case "xattrs":
+		return []*Option{optionXattrs}
+	default:
+		return nil
+	}
 }
 
 // Underlying options.
 var (
 	optionVersion = &Option{
+		ID:             "version",
 		Name:           "version",
 		NameCamelCase:  "version",
 		NamePascalCase: "Version",
+		NameSnakeCase:  "version",
 		DefaultFlag:    "--version",
 		Executable:     true,
 		Help:           "Print program version and exit",
@@ -738,10 +1702,11 @@ var (
 		Name:           "update",
 		NameCamelCase:  "update",
 		NamePascalCase: "Update",
+		NameSnakeCase:  "update",
 		URLs: []*OptionURL{
 			{
 				Name: "Update Notes",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#update",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#update",
 			},
 		},
 		DefaultFlag: "--update",
@@ -756,6 +1721,7 @@ var (
 		Name:           "no-update",
 		NameCamelCase:  "noUpdate",
 		NamePascalCase: "NoUpdate",
+		NameSnakeCase:  "no_update",
 		DefaultFlag:    "--no-update",
 		Executable:     false,
 		Help:           "Do not check for updates (default)",
@@ -767,10 +1733,11 @@ var (
 		Name:           "update-to",
 		NameCamelCase:  "updateTo",
 		NamePascalCase: "UpdateTo",
+		NameSnakeCase:  "update_to",
 		URLs: []*OptionURL{
 			{
 				Name: "Update Notes",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#update",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#update",
 			},
 		},
 		DefaultFlag: "--update-to",
@@ -787,6 +1754,7 @@ var (
 		Name:           "ignore-errors",
 		NameCamelCase:  "ignoreErrors",
 		NamePascalCase: "IgnoreErrors",
+		NameSnakeCase:  "ignore_errors",
 		DefaultFlag:    "--ignore-errors",
 		Executable:     false,
 		Help:           "Ignore download and postprocessing errors. The download will be considered successful even if the postprocessing fails",
@@ -799,6 +1767,7 @@ var (
 		Name:           "no-abort-on-error",
 		NameCamelCase:  "noAbortOnError",
 		NamePascalCase: "NoAbortOnError",
+		NameSnakeCase:  "no_abort_on_error",
 		DefaultFlag:    "--no-abort-on-error",
 		Executable:     false,
 		Help:           "Continue with next video on download errors; e.g. to skip unavailable videos in a playlist (default)",
@@ -810,28 +1779,19 @@ var (
 		Name:           "abort-on-error",
 		NameCamelCase:  "abortOnError",
 		NamePascalCase: "AbortOnError",
+		NameSnakeCase:  "abort_on_error",
 		DefaultFlag:    "--abort-on-error",
 		Executable:     false,
 		Help:           "Abort downloading of further videos if an error occurs",
 		Type:           "bool",
 		LongFlags:      []string{"--abort-on-error", "--no-ignore-errors"},
 	}
-	optionDumpUserAgent = &Option{
-		ID:             "dump_user_agent",
-		Name:           "dump-user-agent",
-		NameCamelCase:  "dumpUserAgent",
-		NamePascalCase: "DumpUserAgent",
-		DefaultFlag:    "--dump-user-agent",
-		Executable:     true,
-		Help:           "Display the current user-agent and exit",
-		Type:           "bool",
-		LongFlags:      []string{"--dump-user-agent"},
-	}
 	optionListExtractors = &Option{
 		ID:             "list_extractors",
 		Name:           "list-extractors",
 		NameCamelCase:  "listExtractors",
 		NamePascalCase: "ListExtractors",
+		NameSnakeCase:  "list_extractors",
 		DefaultFlag:    "--list-extractors",
 		Executable:     true,
 		Help:           "List all supported extractors and exit",
@@ -843,6 +1803,7 @@ var (
 		Name:           "extractor-descriptions",
 		NameCamelCase:  "extractorDescriptions",
 		NamePascalCase: "ExtractorDescriptions",
+		NameSnakeCase:  "extractor_descriptions",
 		DefaultFlag:    "--extractor-descriptions",
 		Executable:     true,
 		Help:           "Output descriptions of all supported extractors and exit",
@@ -854,6 +1815,7 @@ var (
 		Name:           "use-extractors",
 		NameCamelCase:  "useExtractors",
 		NamePascalCase: "UseExtractors",
+		NameSnakeCase:  "use_extractors",
 		DefaultFlag:    "--use-extractors",
 		ArgNames:       []string{"names"},
 		Executable:     false,
@@ -868,6 +1830,7 @@ var (
 		Name:           "force-generic-extractor",
 		NameCamelCase:  "forceGenericExtractor",
 		NamePascalCase: "ForceGenericExtractor",
+		NameSnakeCase:  "force_generic_extractor",
 		DefaultFlag:    "--force-generic-extractor",
 		Executable:     false,
 		Deprecated:     "Use [Command.UseExtractors] with `generic,default` as an argument.",
@@ -880,6 +1843,7 @@ var (
 		Name:           "default-search",
 		NameCamelCase:  "defaultSearch",
 		NamePascalCase: "DefaultSearch",
+		NameSnakeCase:  "default_search",
 		DefaultFlag:    "--default-search",
 		ArgNames:       []string{"prefix"},
 		Executable:     false,
@@ -894,6 +1858,7 @@ var (
 		Name:           "ignore-config",
 		NameCamelCase:  "ignoreConfig",
 		NamePascalCase: "IgnoreConfig",
+		NameSnakeCase:  "ignore_config",
 		DefaultFlag:    "--ignore-config",
 		Executable:     false,
 		Help:           "Don't load any more configuration files except those given to --config-locations. For backward compatibility, if this option is found inside the system configuration file, the user configuration is not loaded.",
@@ -905,6 +1870,7 @@ var (
 		Name:           "no-config-locations",
 		NameCamelCase:  "noConfigLocations",
 		NamePascalCase: "NoConfigLocations",
+		NameSnakeCase:  "no_config_locations",
 		DefaultFlag:    "--no-config-locations",
 		Executable:     false,
 		Help:           "Do not load any custom configuration files (default). When given inside a configuration file, ignore all previous --config-locations defined in the current file",
@@ -916,6 +1882,7 @@ var (
 		Name:           "config-locations",
 		NameCamelCase:  "configLocations",
 		NamePascalCase: "ConfigLocations",
+		NameSnakeCase:  "config_locations",
 		DefaultFlag:    "--config-locations",
 		ArgNames:       []string{"path"},
 		Executable:     false,
@@ -930,11 +1897,12 @@ var (
 		Name:           "plugin-dirs",
 		NameCamelCase:  "pluginDirs",
 		NamePascalCase: "PluginDirs",
+		NameSnakeCase:  "plugin_dirs",
 		DefaultFlag:    "--plugin-dirs",
-		ArgNames:       []string{"path"},
+		ArgNames:       []string{"dir"},
 		Executable:     false,
 		Help:           "Path to an additional directory to search for plugins. This option can be used multiple times to add multiple directories. Use \"default\" to search the default plugin directories (default)",
-		MetaArgs:       "PATH",
+		MetaArgs:       "DIR",
 		Type:           "string",
 		LongFlags:      []string{"--plugin-dirs"},
 		NArgs:          1,
@@ -944,17 +1912,75 @@ var (
 		Name:           "no-plugin-dirs",
 		NameCamelCase:  "noPluginDirs",
 		NamePascalCase: "NoPluginDirs",
+		NameSnakeCase:  "no_plugin_dirs",
 		DefaultFlag:    "--no-plugin-dirs",
 		Executable:     false,
 		Help:           "Clear plugin directories to search, including defaults and those provided by previous --plugin-dirs",
 		Type:           "bool",
 		LongFlags:      []string{"--no-plugin-dirs"},
 	}
+	optionJsRuntimes = &Option{
+		ID:             "js_runtimes",
+		Name:           "js-runtimes",
+		NameCamelCase:  "jsRuntimes",
+		NamePascalCase: "JsRuntimes",
+		NameSnakeCase:  "js_runtimes",
+		DefaultFlag:    "--js-runtimes",
+		ArgNames:       []string{"runtime"},
+		Executable:     false,
+		Help:           "Additional JavaScript runtime to enable, with an optional location for the runtime (either the path to the binary or its containing directory). This option can be used multiple times to enable multiple runtimes. Supported runtimes are (in order of priority, from highest to lowest): deno, node, quickjs, bun. Only \"deno\" is enabled by default. The highest priority runtime that is both enabled and available will be used. In order to use a lower priority runtime when \"deno\" is available, --no-js-runtimes needs to be passed before enabling other runtimes",
+		MetaArgs:       "RUNTIME[:PATH]",
+		Type:           "string",
+		LongFlags:      []string{"--js-runtimes"},
+		NArgs:          1,
+		NoOverride:     true,
+	}
+	optionNoJsRuntimes = &Option{
+		ID:             "js_runtimes",
+		Name:           "no-js-runtimes",
+		NameCamelCase:  "noJsRuntimes",
+		NamePascalCase: "NoJsRuntimes",
+		NameSnakeCase:  "no_js_runtimes",
+		DefaultFlag:    "--no-js-runtimes",
+		Executable:     false,
+		Help:           "Clear JavaScript runtimes to enable, including defaults and those provided by previous --js-runtimes",
+		Type:           "bool",
+		LongFlags:      []string{"--no-js-runtimes"},
+		NoOverride:     true,
+	}
+	optionRemoteComponents = &Option{
+		ID:             "remote_components",
+		Name:           "remote-components",
+		NameCamelCase:  "remoteComponents",
+		NamePascalCase: "RemoteComponents",
+		NameSnakeCase:  "remote_components",
+		DefaultFlag:    "--remote-components",
+		ArgNames:       []string{"component"},
+		Executable:     false,
+		Help:           "Remote components to allow yt-dlp to fetch when required. This option is currently not needed if you are using an official executable or have the requisite version of the yt-dlp-ejs package installed. You can use this option multiple times to allow multiple components. Supported values: ejs:npm (external JavaScript components from npm), ejs:github (external JavaScript components from yt-dlp-ejs GitHub). By default, no remote components are allowed",
+		MetaArgs:       "COMPONENT",
+		Type:           "string",
+		LongFlags:      []string{"--remote-components"},
+		NArgs:          1,
+	}
+	optionNoRemoteComponents = &Option{
+		ID:             "remote_components",
+		Name:           "no-remote-components",
+		NameCamelCase:  "noRemoteComponents",
+		NamePascalCase: "NoRemoteComponents",
+		NameSnakeCase:  "no_remote_components",
+		DefaultFlag:    "--no-remote-components",
+		Executable:     false,
+		Help:           "Disallow fetching of all remote components, including any previously allowed by --remote-components or defaults.",
+		Type:           "bool",
+		LongFlags:      []string{"--no-remote-components"},
+	}
 	optionFlatPlaylist = &Option{
 		ID:             "extract_flat",
 		Name:           "flat-playlist",
 		NameCamelCase:  "flatPlaylist",
 		NamePascalCase: "FlatPlaylist",
+		NameSnakeCase:  "flat_playlist",
 		DefaultFlag:    "--flat-playlist",
 		Executable:     false,
 		Help:           "Do not extract a playlist's URL result entries; some entry metadata may be missing and downloading may be bypassed",
@@ -966,6 +1992,7 @@ var (
 		Name:           "no-flat-playlist",
 		NameCamelCase:  "noFlatPlaylist",
 		NamePascalCase: "NoFlatPlaylist",
+		NameSnakeCase:  "no_flat_playlist",
 		DefaultFlag:    "--no-flat-playlist",
 		Executable:     false,
 		Help:           "Fully extract the videos of a playlist (default)",
@@ -977,9 +2004,10 @@ var (
 		Name:           "live-from-start",
 		NameCamelCase:  "liveFromStart",
 		NamePascalCase: "LiveFromStart",
+		NameSnakeCase:  "live_from_start",
 		DefaultFlag:    "--live-from-start",
 		Executable:     false,
-		Help:           "Download livestreams from the start. Currently only supported for YouTube (Experimental)",
+		Help:           "Download livestreams from the start. Currently experimental and only supported for YouTube, Twitch, and TVer",
 		Type:           "bool",
 		LongFlags:      []string{"--live-from-start"},
 	}
@@ -988,6 +2016,7 @@ var (
 		Name:           "no-live-from-start",
 		NameCamelCase:  "noLiveFromStart",
 		NamePascalCase: "NoLiveFromStart",
+		NameSnakeCase:  "no_live_from_start",
 		DefaultFlag:    "--no-live-from-start",
 		Executable:     false,
 		Help:           "Download livestreams from the current time (default)",
@@ -999,6 +2028,7 @@ var (
 		Name:           "wait-for-video",
 		NameCamelCase:  "waitForVideo",
 		NamePascalCase: "WaitForVideo",
+		NameSnakeCase:  "wait_for_video",
 		DefaultFlag:    "--wait-for-video",
 		ArgNames:       []string{"min"},
 		Executable:     false,
@@ -1013,6 +2043,7 @@ var (
 		Name:           "no-wait-for-video",
 		NameCamelCase:  "noWaitForVideo",
 		NamePascalCase: "NoWaitForVideo",
+		NameSnakeCase:  "no_wait_for_video",
 		DefaultFlag:    "--no-wait-for-video",
 		Executable:     false,
 		Help:           "Do not wait for scheduled streams (default)",
@@ -1024,6 +2055,7 @@ var (
 		Name:           "mark-watched",
 		NameCamelCase:  "markWatched",
 		NamePascalCase: "MarkWatched",
+		NameSnakeCase:  "mark_watched",
 		DefaultFlag:    "--mark-watched",
 		Executable:     false,
 		Help:           "Mark videos watched (even with --simulate)",
@@ -1035,6 +2067,7 @@ var (
 		Name:           "no-mark-watched",
 		NameCamelCase:  "noMarkWatched",
 		NamePascalCase: "NoMarkWatched",
+		NameSnakeCase:  "no_mark_watched",
 		DefaultFlag:    "--no-mark-watched",
 		Executable:     false,
 		Help:           "Do not mark videos watched (default)",
@@ -1046,6 +2079,7 @@ var (
 		Name:           "no-colors",
 		NameCamelCase:  "noColors",
 		NamePascalCase: "NoColors",
+		NameSnakeCase:  "no_colors",
 		DefaultFlag:    "--no-colors",
 		Executable:     false,
 		Deprecated:     "Use [Command.Color] with `no_color` as an argument.",
@@ -1058,6 +2092,7 @@ var (
 		Name:           "color",
 		NameCamelCase:  "color",
 		NamePascalCase: "Color",
+		NameSnakeCase:  "color",
 		DefaultFlag:    "--color",
 		ArgNames:       []string{"policy"},
 		Executable:     false,
@@ -1072,10 +2107,11 @@ var (
 		Name:           "compat-options",
 		NameCamelCase:  "compatOptions",
 		NamePascalCase: "CompatOptions",
+		NameSnakeCase:  "compat_options",
 		URLs: []*OptionURL{
 			{
 				Name: "Compatibility Options",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#differences-in-default-behavior",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#differences-in-default-behavior",
 			},
 		},
 		DefaultFlag: "--compat-options",
@@ -1087,11 +2123,28 @@ var (
 		LongFlags:   []string{"--compat-options"},
 		NArgs:       1,
 	}
+	optionPresetAlias = &Option{
+		ID:             "preset-alias",
+		Name:           "preset-alias",
+		NameCamelCase:  "presetAlias",
+		NamePascalCase: "PresetAlias",
+		NameSnakeCase:  "preset_alias",
+		DefaultFlag:    "--preset-alias",
+		ArgNames:       []string{"preset"},
+		Executable:     false,
+		Help:           "Applies a predefined set of options. e.g. --preset-alias mp3. The following presets are available: mp3, aac, mp4, mkv, sleep. See the \"Preset Aliases\" section at the end for more info. This option can be used multiple times",
+		MetaArgs:       "PRESET",
+		Type:           "string",
+		LongFlags:      []string{"--preset-alias"},
+		ShortFlags:     []string{"-t"},
+		NArgs:          1,
+	}
 	optionProxy = &Option{
 		ID:             "proxy",
 		Name:           "proxy",
 		NameCamelCase:  "proxy",
 		NamePascalCase: "Proxy",
+		NameSnakeCase:  "proxy",
 		DefaultFlag:    "--proxy",
 		ArgNames:       []string{"url"},
 		Executable:     false,
@@ -1106,6 +2159,7 @@ var (
 		Name:           "socket-timeout",
 		NameCamelCase:  "socketTimeout",
 		NamePascalCase: "SocketTimeout",
+		NameSnakeCase:  "socket_timeout",
 		DefaultFlag:    "--socket-timeout",
 		ArgNames:       []string{"seconds"},
 		Executable:     false,
@@ -1120,6 +2174,7 @@ var (
 		Name:           "source-address",
 		NameCamelCase:  "sourceAddress",
 		NamePascalCase: "SourceAddress",
+		NameSnakeCase:  "source_address",
 		DefaultFlag:    "--source-address",
 		ArgNames:       []string{"ip"},
 		Executable:     false,
@@ -1134,6 +2189,7 @@ var (
 		Name:           "impersonate",
 		NameCamelCase:  "impersonate",
 		NamePascalCase: "Impersonate",
+		NameSnakeCase:  "impersonate",
 		DefaultFlag:    "--impersonate",
 		ArgNames:       []string{"client"},
 		Executable:     false,
@@ -1148,6 +2204,7 @@ var (
 		Name:           "list-impersonate-targets",
 		NameCamelCase:  "listImpersonateTargets",
 		NamePascalCase: "ListImpersonateTargets",
+		NameSnakeCase:  "list_impersonate_targets",
 		DefaultFlag:    "--list-impersonate-targets",
 		Executable:     false,
 		Help:           "List available clients to impersonate.",
@@ -1159,6 +2216,7 @@ var (
 		Name:           "force-ipv4",
 		NameCamelCase:  "forceIPv4",
 		NamePascalCase: "ForceIPv4",
+		NameSnakeCase:  "force_ipv_4",
 		DefaultFlag:    "--force-ipv4",
 		Executable:     false,
 		Help:           "Make all connections via IPv4",
@@ -1171,6 +2229,7 @@ var (
 		Name:           "force-ipv6",
 		NameCamelCase:  "forceIPv6",
 		NamePascalCase: "ForceIPv6",
+		NameSnakeCase:  "force_ipv_6",
 		DefaultFlag:    "--force-ipv6",
 		Executable:     false,
 		Help:           "Make all connections via IPv6",
@@ -1183,6 +2242,7 @@ var (
 		Name:           "enable-file-urls",
 		NameCamelCase:  "enableFileURLs",
 		NamePascalCase: "EnableFileURLs",
+		NameSnakeCase:  "enable_file_urls",
 		DefaultFlag:    "--enable-file-urls",
 		Executable:     false,
 		Help:           "Enable file:// URLs. This is disabled by default for security reasons.",
@@ -1194,6 +2254,7 @@ var (
 		Name:           "geo-verification-proxy",
 		NameCamelCase:  "geoVerificationProxy",
 		NamePascalCase: "GeoVerificationProxy",
+		NameSnakeCase:  "geo_verification_proxy",
 		DefaultFlag:    "--geo-verification-proxy",
 		ArgNames:       []string{"url"},
 		Executable:     false,
@@ -1203,26 +2264,12 @@ var (
 		LongFlags:      []string{"--geo-verification-proxy"},
 		NArgs:          1,
 	}
-	optionCNVerificationProxy = &Option{
-		ID:             "cn_verification_proxy",
-		Name:           "cn-verification-proxy",
-		NameCamelCase:  "cnVerificationProxy",
-		NamePascalCase: "CNVerificationProxy",
-		DefaultFlag:    "--cn-verification-proxy",
-		ArgNames:       []string{"url"},
-		Executable:     false,
-		Deprecated:     "Use [Command.GeoVerificationProxy] instead.",
-		Hidden:         true,
-		MetaArgs:       "URL",
-		Type:           "string",
-		LongFlags:      []string{"--cn-verification-proxy"},
-		NArgs:          1,
-	}
 	optionXFF = &Option{
 		ID:             "geo_bypass",
 		Name:           "xff",
 		NameCamelCase:  "xff",
 		NamePascalCase: "XFF",
+		NameSnakeCase:  "xff",
 		DefaultFlag:    "--xff",
 		ArgNames:       []string{"value"},
 		Executable:     false,
@@ -1237,6 +2284,7 @@ var (
 		Name:           "geo-bypass",
 		NameCamelCase:  "geoBypass",
 		NamePascalCase: "GeoBypass",
+		NameSnakeCase:  "geo_bypass",
 		DefaultFlag:    "--geo-bypass",
 		Executable:     false,
 		Deprecated:     "Use [Command.XFF] with `default` as an argument.",
@@ -1249,6 +2297,7 @@ var (
 		Name:           "no-geo-bypass",
 		NameCamelCase:  "noGeoBypass",
 		NamePascalCase: "NoGeoBypass",
+		NameSnakeCase:  "no_geo_bypass",
 		DefaultFlag:    "--no-geo-bypass",
 		Executable:     false,
 		Deprecated:     "Use [Command.XFF] with `never` as an argument.",
@@ -1261,6 +2310,7 @@ var (
 		Name:           "geo-bypass-country",
 		NameCamelCase:  "geoBypassCountry",
 		NamePascalCase: "GeoBypassCountry",
+		NameSnakeCase:  "geo_bypass_country",
 		DefaultFlag:    "--geo-bypass-country",
 		ArgNames:       []string{"code"},
 		Executable:     false,
@@ -1276,6 +2326,7 @@ var (
 		Name:           "geo-bypass-ip-block",
 		NameCamelCase:  "geoBypassIPBlock",
 		NamePascalCase: "GeoBypassIPBlock",
+		NameSnakeCase:  "geo_bypass_ip_block",
 		DefaultFlag:    "--geo-bypass-ip-block",
 		ArgNames:       []string{"ipBlock"},
 		Executable:     false,
@@ -1291,6 +2342,7 @@ var (
 		Name:           "playlist-start",
 		NameCamelCase:  "playlistStart",
 		NamePascalCase: "PlaylistStart",
+		NameSnakeCase:  "playlist_start",
 		DefaultFlag:    "--playlist-start",
 		ArgNames:       []string{"number"},
 		Executable:     false,
@@ -1306,6 +2358,7 @@ var (
 		Name:           "playlist-end",
 		NameCamelCase:  "playlistEnd",
 		NamePascalCase: "PlaylistEnd",
+		NameSnakeCase:  "playlist_end",
 		DefaultFlag:    "--playlist-end",
 		ArgNames:       []string{"number"},
 		Executable:     false,
@@ -1321,10 +2374,11 @@ var (
 		Name:           "playlist-items",
 		NameCamelCase:  "playlistItems",
 		NamePascalCase: "PlaylistItems",
+		NameSnakeCase:  "playlist_items",
 		DefaultFlag:    "--playlist-items",
 		ArgNames:       []string{"itemSpec"},
 		Executable:     false,
-		Help:           "Comma separated playlist_index of the items to download. You can specify a range using \"[START]:[STOP][:STEP]\". For backward compatibility, START-STOP is also supported. Use negative indices to count from the right and negative STEP to download in reverse order. E.g. \"-I 1:3,7,-5::2\" used on a playlist of size 15 will download the items at index 1,2,3,7,11,13,15",
+		Help:           "Comma-separated playlist_index of the items to download. You can specify a range using \"[START]:[STOP][:STEP]\". For backward compatibility, START-STOP is also supported. Use negative indices to count from the right and negative STEP to download in reverse order. E.g. \"-I 1:3,7,-5::2\" used on a playlist of size 15 will download the items at index 1,2,3,7,11,13,15",
 		MetaArgs:       "ITEM_SPEC",
 		Type:           "string",
 		LongFlags:      []string{"--playlist-items"},
@@ -1336,6 +2390,7 @@ var (
 		Name:           "match-title",
 		NameCamelCase:  "matchTitle",
 		NamePascalCase: "MatchTitle",
+		NameSnakeCase:  "match_title",
 		DefaultFlag:    "--match-title",
 		ArgNames:       []string{"regex"},
 		Executable:     false,
@@ -1351,6 +2406,7 @@ var (
 		Name:           "reject-title",
 		NameCamelCase:  "rejectTitle",
 		NamePascalCase: "RejectTitle",
+		NameSnakeCase:  "reject_title",
 		DefaultFlag:    "--reject-title",
 		ArgNames:       []string{"regex"},
 		Executable:     false,
@@ -1366,6 +2422,7 @@ var (
 		Name:           "min-filesize",
 		NameCamelCase:  "minFileSize",
 		NamePascalCase: "MinFileSize",
+		NameSnakeCase:  "min_filesize",
 		DefaultFlag:    "--min-filesize",
 		ArgNames:       []string{"size"},
 		Executable:     false,
@@ -1380,6 +2437,7 @@ var (
 		Name:           "max-filesize",
 		NameCamelCase:  "maxFileSize",
 		NamePascalCase: "MaxFileSize",
+		NameSnakeCase:  "max_filesize",
 		DefaultFlag:    "--max-filesize",
 		ArgNames:       []string{"size"},
 		Executable:     false,
@@ -1394,6 +2452,7 @@ var (
 		Name:           "date",
 		NameCamelCase:  "date",
 		NamePascalCase: "Date",
+		NameSnakeCase:  "date",
 		DefaultFlag:    "--date",
 		ArgNames:       []string{"date"},
 		Executable:     false,
@@ -1408,6 +2467,7 @@ var (
 		Name:           "datebefore",
 		NameCamelCase:  "dateBefore",
 		NamePascalCase: "DateBefore",
+		NameSnakeCase:  "datebefore",
 		DefaultFlag:    "--datebefore",
 		ArgNames:       []string{"date"},
 		Executable:     false,
@@ -1422,6 +2482,7 @@ var (
 		Name:           "dateafter",
 		NameCamelCase:  "dateAfter",
 		NamePascalCase: "DateAfter",
+		NameSnakeCase:  "dateafter",
 		DefaultFlag:    "--dateafter",
 		ArgNames:       []string{"date"},
 		Executable:     false,
@@ -1436,6 +2497,7 @@ var (
 		Name:           "min-views",
 		NameCamelCase:  "minViews",
 		NamePascalCase: "MinViews",
+		NameSnakeCase:  "min_views",
 		DefaultFlag:    "--min-views",
 		ArgNames:       []string{"count"},
 		Executable:     false,
@@ -1451,6 +2513,7 @@ var (
 		Name:           "max-views",
 		NameCamelCase:  "maxViews",
 		NamePascalCase: "MaxViews",
+		NameSnakeCase:  "max_views",
 		DefaultFlag:    "--max-views",
 		ArgNames:       []string{"count"},
 		Executable:     false,
@@ -1466,6 +2529,7 @@ var (
 		Name:           "match-filters",
 		NameCamelCase:  "matchFilters",
 		NamePascalCase: "MatchFilters",
+		NameSnakeCase:  "match_filters",
 		DefaultFlag:    "--match-filters",
 		ArgNames:       []string{"filter"},
 		Executable:     false,
@@ -1480,6 +2544,7 @@ var (
 		Name:           "no-match-filters",
 		NameCamelCase:  "noMatchFilters",
 		NamePascalCase: "NoMatchFilters",
+		NameSnakeCase:  "no_match_filters",
 		DefaultFlag:    "--no-match-filters",
 		Executable:     false,
 		Help:           "Do not use any --match-filters (default)",
@@ -1491,6 +2556,7 @@ var (
 		Name:           "break-match-filters",
 		NameCamelCase:  "breakMatchFilters",
 		NamePascalCase: "BreakMatchFilters",
+		NameSnakeCase:  "break_match_filters",
 		DefaultFlag:    "--break-match-filters",
 		ArgNames:       []string{"filter"},
 		Executable:     false,
@@ -1505,6 +2571,7 @@ var (
 		Name:           "no-break-match-filters",
 		NameCamelCase:  "noBreakMatchFilters",
 		NamePascalCase: "NoBreakMatchFilters",
+		NameSnakeCase:  "no_break_match_filters",
 		DefaultFlag:    "--no-break-match-filters",
 		Executable:     false,
 		Help:           "Do not use any --break-match-filters (default)",
@@ -1516,6 +2583,7 @@ var (
 		Name:           "no-playlist",
 		NameCamelCase:  "noPlaylist",
 		NamePascalCase: "NoPlaylist",
+		NameSnakeCase:  "no_playlist",
 		DefaultFlag:    "--no-playlist",
 		Executable:     false,
 		Help:           "Download only the video, if the URL refers to a video and a playlist",
@@ -1527,6 +2595,7 @@ var (
 		Name:           "yes-playlist",
 		NameCamelCase:  "yesPlaylist",
 		NamePascalCase: "YesPlaylist",
+		NameSnakeCase:  "yes_playlist",
 		DefaultFlag:    "--yes-playlist",
 		Executable:     false,
 		Help:           "Download the playlist, if the URL refers to a video and a playlist",
@@ -1538,6 +2607,7 @@ var (
 		Name:           "age-limit",
 		NameCamelCase:  "ageLimit",
 		NamePascalCase: "AgeLimit",
+		NameSnakeCase:  "age_limit",
 		DefaultFlag:    "--age-limit",
 		ArgNames:       []string{"years"},
 		Executable:     false,
@@ -1552,6 +2622,7 @@ var (
 		Name:           "download-archive",
 		NameCamelCase:  "downloadArchive",
 		NamePascalCase: "DownloadArchive",
+		NameSnakeCase:  "download_archive",
 		DefaultFlag:    "--download-archive",
 		ArgNames:       []string{"file"},
 		Executable:     false,
@@ -1566,6 +2637,7 @@ var (
 		Name:           "no-download-archive",
 		NameCamelCase:  "noDownloadArchive",
 		NamePascalCase: "NoDownloadArchive",
+		NameSnakeCase:  "no_download_archive",
 		DefaultFlag:    "--no-download-archive",
 		Executable:     false,
 		Help:           "Do not use archive file (default)",
@@ -1577,6 +2649,7 @@ var (
 		Name:           "max-downloads",
 		NameCamelCase:  "maxDownloads",
 		NamePascalCase: "MaxDownloads",
+		NameSnakeCase:  "max_downloads",
 		DefaultFlag:    "--max-downloads",
 		ArgNames:       []string{"number"},
 		Executable:     false,
@@ -1591,6 +2664,7 @@ var (
 		Name:           "break-on-existing",
 		NameCamelCase:  "breakOnExisting",
 		NamePascalCase: "BreakOnExisting",
+		NameSnakeCase:  "break_on_existing",
 		DefaultFlag:    "--break-on-existing",
 		Executable:     false,
 		Help:           "Stop the download process when encountering a file that is in the archive supplied with the --download-archive option",
@@ -1602,6 +2676,7 @@ var (
 		Name:           "no-break-on-existing",
 		NameCamelCase:  "noBreakOnExisting",
 		NamePascalCase: "NoBreakOnExisting",
+		NameSnakeCase:  "no_break_on_existing",
 		DefaultFlag:    "--no-break-on-existing",
 		Executable:     false,
 		Help:           "Do not stop the download process when encountering a file that is in the archive (default)",
@@ -1613,6 +2688,7 @@ var (
 		Name:           "break-on-reject",
 		NameCamelCase:  "breakOnReject",
 		NamePascalCase: "BreakOnReject",
+		NameSnakeCase:  "break_on_reject",
 		DefaultFlag:    "--break-on-reject",
 		Executable:     false,
 		Deprecated:     "Use [Command.BreakMatchFilters] instead.",
@@ -1625,6 +2701,7 @@ var (
 		Name:           "break-per-input",
 		NameCamelCase:  "breakPerInput",
 		NamePascalCase: "BreakPerInput",
+		NameSnakeCase:  "break_per_input",
 		DefaultFlag:    "--break-per-input",
 		Executable:     false,
 		Help:           "Alters --max-downloads, --break-on-existing, --break-match-filters, and autonumber to reset per input URL",
@@ -1636,6 +2713,7 @@ var (
 		Name:           "no-break-per-input",
 		NameCamelCase:  "noBreakPerInput",
 		NamePascalCase: "NoBreakPerInput",
+		NameSnakeCase:  "no_break_per_input",
 		DefaultFlag:    "--no-break-per-input",
 		Executable:     false,
 		Help:           "--break-on-existing and similar options terminates the entire download queue",
@@ -1647,6 +2725,7 @@ var (
 		Name:           "skip-playlist-after-errors",
 		NameCamelCase:  "skipPlaylistAfterErrors",
 		NamePascalCase: "SkipPlaylistAfterErrors",
+		NameSnakeCase:  "skip_playlist_after_errors",
 		DefaultFlag:    "--skip-playlist-after-errors",
 		ArgNames:       []string{"n"},
 		Executable:     false,
@@ -1656,35 +2735,12 @@ var (
 		LongFlags:      []string{"--skip-playlist-after-errors"},
 		NArgs:          1,
 	}
-	optionIncludeAds = &Option{
-		ID:             "include_ads",
-		Name:           "include-ads",
-		NameCamelCase:  "includeAds",
-		NamePascalCase: "IncludeAds",
-		DefaultFlag:    "--include-ads",
-		Executable:     false,
-		Deprecated:     "No longer supported.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--include-ads"},
-	}
-	optionNoIncludeAds = &Option{
-		ID:             "include_ads",
-		Name:           "no-include-ads",
-		NameCamelCase:  "noIncludeAds",
-		NamePascalCase: "NoIncludeAds",
-		DefaultFlag:    "--no-include-ads",
-		Executable:     false,
-		Deprecated:     "This flag is now default in yt-dlp.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--no-include-ads"},
-	}
 	optionConcurrentFragments = &Option{
 		ID:             "concurrent_fragment_downloads",
 		Name:           "concurrent-fragments",
 		NameCamelCase:  "concurrentFragments",
 		NamePascalCase: "ConcurrentFragments",
+		NameSnakeCase:  "concurrent_fragments",
 		DefaultFlag:    "--concurrent-fragments",
 		ArgNames:       []string{"n"},
 		Executable:     false,
@@ -1700,6 +2756,7 @@ var (
 		Name:           "limit-rate",
 		NameCamelCase:  "limitRate",
 		NamePascalCase: "LimitRate",
+		NameSnakeCase:  "limit_rate",
 		DefaultFlag:    "--limit-rate",
 		ArgNames:       []string{"rate"},
 		Executable:     false,
@@ -1715,6 +2772,7 @@ var (
 		Name:           "throttled-rate",
 		NameCamelCase:  "throttledRate",
 		NamePascalCase: "ThrottledRate",
+		NameSnakeCase:  "throttled_rate",
 		DefaultFlag:    "--throttled-rate",
 		ArgNames:       []string{"rate"},
 		Executable:     false,
@@ -1729,6 +2787,7 @@ var (
 		Name:           "retries",
 		NameCamelCase:  "retries",
 		NamePascalCase: "Retries",
+		NameSnakeCase:  "retries",
 		DefaultFlag:    "--retries",
 		ArgNames:       []string{"retries"},
 		Executable:     false,
@@ -1744,6 +2803,7 @@ var (
 		Name:           "file-access-retries",
 		NameCamelCase:  "fileAccessRetries",
 		NamePascalCase: "FileAccessRetries",
+		NameSnakeCase:  "file_access_retries",
 		DefaultFlag:    "--file-access-retries",
 		ArgNames:       []string{"retries"},
 		Executable:     false,
@@ -1758,6 +2818,7 @@ var (
 		Name:           "fragment-retries",
 		NameCamelCase:  "fragmentRetries",
 		NamePascalCase: "FragmentRetries",
+		NameSnakeCase:  "fragment_retries",
 		DefaultFlag:    "--fragment-retries",
 		ArgNames:       []string{"retries"},
 		Executable:     false,
@@ -1772,6 +2833,7 @@ var (
 		Name:           "retry-sleep",
 		NameCamelCase:  "retrySleep",
 		NamePascalCase: "RetrySleep",
+		NameSnakeCase:  "retry_sleep",
 		DefaultFlag:    "--retry-sleep",
 		ArgNames:       []string{"expr"},
 		Executable:     false,
@@ -1786,6 +2848,7 @@ var (
 		Name:           "skip-unavailable-fragments",
 		NameCamelCase:  "skipUnavailableFragments",
 		NamePascalCase: "SkipUnavailableFragments",
+		NameSnakeCase:  "skip_unavailable_fragments",
 		DefaultFlag:    "--skip-unavailable-fragments",
 		Executable:     false,
 		Help:           "Skip unavailable fragments for DASH, hlsnative and ISM downloads (default)",
@@ -1797,6 +2860,7 @@ var (
 		Name:           "abort-on-unavailable-fragments",
 		NameCamelCase:  "abortOnUnavailableFragments",
 		NamePascalCase: "AbortOnUnavailableFragments",
+		NameSnakeCase:  "abort_on_unavailable_fragments",
 		DefaultFlag:    "--abort-on-unavailable-fragments",
 		Executable:     false,
 		Help:           "Abort download if a fragment is unavailable",
@@ -1808,6 +2872,7 @@ var (
 		Name:           "keep-fragments",
 		NameCamelCase:  "keepFragments",
 		NamePascalCase: "KeepFragments",
+		NameSnakeCase:  "keep_fragments",
 		DefaultFlag:    "--keep-fragments",
 		Executable:     false,
 		Help:           "Keep downloaded fragments on disk after downloading is finished",
@@ -1819,6 +2884,7 @@ var (
 		Name:           "no-keep-fragments",
 		NameCamelCase:  "noKeepFragments",
 		NamePascalCase: "NoKeepFragments",
+		NameSnakeCase:  "no_keep_fragments",
 		DefaultFlag:    "--no-keep-fragments",
 		Executable:     false,
 		Help:           "Delete downloaded fragments after downloading is finished (default)",
@@ -1830,6 +2896,7 @@ var (
 		Name:           "buffer-size",
 		NameCamelCase:  "bufferSize",
 		NamePascalCase: "BufferSize",
+		NameSnakeCase:  "buffer_size",
 		DefaultFlag:    "--buffer-size",
 		ArgNames:       []string{"size"},
 		Executable:     false,
@@ -1844,6 +2911,7 @@ var (
 		Name:           "resize-buffer",
 		NameCamelCase:  "resizeBuffer",
 		NamePascalCase: "ResizeBuffer",
+		NameSnakeCase:  "resize_buffer",
 		DefaultFlag:    "--resize-buffer",
 		Executable:     false,
 		Help:           "The buffer size is automatically resized from an initial value of --buffer-size (default)",
@@ -1855,6 +2923,7 @@ var (
 		Name:           "no-resize-buffer",
 		NameCamelCase:  "noResizeBuffer",
 		NamePascalCase: "NoResizeBuffer",
+		NameSnakeCase:  "no_resize_buffer",
 		DefaultFlag:    "--no-resize-buffer",
 		Executable:     false,
 		Help:           "Do not automatically adjust the buffer size",
@@ -1866,6 +2935,7 @@ var (
 		Name:           "http-chunk-size",
 		NameCamelCase:  "httpChunkSize",
 		NamePascalCase: "HTTPChunkSize",
+		NameSnakeCase:  "http_chunk_size",
 		DefaultFlag:    "--http-chunk-size",
 		ArgNames:       []string{"size"},
 		Executable:     false,
@@ -1880,6 +2950,7 @@ var (
 		Name:           "playlist-reverse",
 		NameCamelCase:  "playlistReverse",
 		NamePascalCase: "PlaylistReverse",
+		NameSnakeCase:  "playlist_reverse",
 		DefaultFlag:    "--playlist-reverse",
 		Executable:     false,
 		Deprecated:     "Use [Command.PlaylistItems] with `::-1` as an argument.",
@@ -1892,6 +2963,7 @@ var (
 		Name:           "no-playlist-reverse",
 		NameCamelCase:  "noPlaylistReverse",
 		NamePascalCase: "NoPlaylistReverse",
+		NameSnakeCase:  "no_playlist_reverse",
 		DefaultFlag:    "--no-playlist-reverse",
 		Executable:     false,
 		Deprecated:     "It is now the default behavior.",
@@ -1904,6 +2976,7 @@ var (
 		Name:           "playlist-random",
 		NameCamelCase:  "playlistRandom",
 		NamePascalCase: "PlaylistRandom",
+		NameSnakeCase:  "playlist_random",
 		DefaultFlag:    "--playlist-random",
 		Executable:     false,
 		Help:           "Download playlist videos in random order",
@@ -1915,6 +2988,7 @@ var (
 		Name:           "lazy-playlist",
 		NameCamelCase:  "lazyPlaylist",
 		NamePascalCase: "LazyPlaylist",
+		NameSnakeCase:  "lazy_playlist",
 		DefaultFlag:    "--lazy-playlist",
 		Executable:     false,
 		Help:           "Process entries in the playlist as they are received. This disables n_entries, --playlist-random and --playlist-reverse",
@@ -1926,28 +3000,19 @@ var (
 		Name:           "no-lazy-playlist",
 		NameCamelCase:  "noLazyPlaylist",
 		NamePascalCase: "NoLazyPlaylist",
+		NameSnakeCase:  "no_lazy_playlist",
 		DefaultFlag:    "--no-lazy-playlist",
 		Executable:     false,
 		Help:           "Process videos in the playlist only after the entire playlist is parsed (default)",
 		Type:           "bool",
 		LongFlags:      []string{"--no-lazy-playlist"},
 	}
-	optionXattrSetFileSize = &Option{
-		ID:             "xattr_set_filesize",
-		Name:           "xattr-set-filesize",
-		NameCamelCase:  "xattrSetFileSize",
-		NamePascalCase: "XattrSetFileSize",
-		DefaultFlag:    "--xattr-set-filesize",
-		Executable:     false,
-		Help:           "Set file xattribute ytdl.filesize with expected file size",
-		Type:           "bool",
-		LongFlags:      []string{"--xattr-set-filesize"},
-	}
 	optionHLSPreferNative = &Option{
 		ID:             "hls_prefer_native",
 		Name:           "hls-prefer-native",
 		NameCamelCase:  "hlsPreferNative",
 		NamePascalCase: "HLSPreferNative",
+		NameSnakeCase:  "hls_prefer_native",
 		DefaultFlag:    "--hls-prefer-native",
 		Executable:     false,
 		Deprecated:     "Use [Command.Downloader] with `m3u8:native` as an argument.",
@@ -1960,6 +3025,7 @@ var (
 		Name:           "hls-prefer-ffmpeg",
 		NameCamelCase:  "hlsPreferFFmpeg",
 		NamePascalCase: "HLSPreferFFmpeg",
+		NameSnakeCase:  "hls_prefer_ffmpeg",
 		DefaultFlag:    "--hls-prefer-ffmpeg",
 		Executable:     false,
 		Deprecated:     "Use [Command.Downloader] with `m3u8:ffmpeg` as an argument.",
@@ -1972,6 +3038,7 @@ var (
 		Name:           "hls-use-mpegts",
 		NameCamelCase:  "hlsUseMPEGTS",
 		NamePascalCase: "HLSUseMPEGTS",
+		NameSnakeCase:  "hls_use_mpegts",
 		DefaultFlag:    "--hls-use-mpegts",
 		Executable:     false,
 		Help:           "Use the mpegts container for HLS videos; allowing some players to play the video while downloading, and reducing the chance of file corruption if download is interrupted. This is enabled by default for live streams",
@@ -1983,6 +3050,7 @@ var (
 		Name:           "no-hls-use-mpegts",
 		NameCamelCase:  "noHLSUseMPEGTS",
 		NamePascalCase: "NoHLSUseMPEGTS",
+		NameSnakeCase:  "no_hls_use_mpegts",
 		DefaultFlag:    "--no-hls-use-mpegts",
 		Executable:     false,
 		Help:           "Do not use the mpegts container for HLS videos. This is default when not downloading live streams",
@@ -1994,6 +3062,7 @@ var (
 		Name:           "download-sections",
 		NameCamelCase:  "downloadSections",
 		NamePascalCase: "DownloadSections",
+		NameSnakeCase:  "download_sections",
 		DefaultFlag:    "--download-sections",
 		ArgNames:       []string{"regex"},
 		Executable:     false,
@@ -2008,10 +3077,11 @@ var (
 		Name:           "downloader",
 		NameCamelCase:  "downloader",
 		NamePascalCase: "Downloader",
+		NameSnakeCase:  "downloader",
 		DefaultFlag:    "--downloader",
 		ArgNames:       []string{"name"},
 		Executable:     false,
-		Help:           "Name or path of the external downloader to use (optionally) prefixed by the protocols (http, ftp, m3u8, dash, rstp, rtmp, mms) to use it for. Currently supports native, aria2c, avconv, axel, curl, ffmpeg, httpie, wget. You can use this option multiple times to set different downloaders for different protocols. E.g. --downloader aria2c --downloader \"dash,m3u8:native\" will use aria2c for http/ftp downloads, and the native downloader for dash/m3u8 downloads",
+		Help:           "Name or path of the external downloader to use (optionally) prefixed by the protocols (http, ftp, m3u8, dash, rstp, rtmp, mms) to use it for. Currently supports native, aria2c, axel, curl, ffmpeg, httpie, wget. You can use this option multiple times to set different downloaders for different protocols. E.g. --downloader aria2c --downloader \"dash,m3u8:native\" will use aria2c for http/ftp downloads, and the native downloader for dash/m3u8 downloads",
 		MetaArgs:       "[PROTO:]NAME",
 		Type:           "string",
 		LongFlags:      []string{"--downloader", "--external-downloader"},
@@ -2022,6 +3092,7 @@ var (
 		Name:           "downloader-args",
 		NameCamelCase:  "downloaderArgs",
 		NamePascalCase: "DownloaderArgs",
+		NameSnakeCase:  "downloader_args",
 		DefaultFlag:    "--downloader-args",
 		ArgNames:       []string{"nameargs"},
 		Executable:     false,
@@ -2036,6 +3107,7 @@ var (
 		Name:           "batch-file",
 		NameCamelCase:  "batchFile",
 		NamePascalCase: "BatchFile",
+		NameSnakeCase:  "batch_file",
 		DefaultFlag:    "--batch-file",
 		ArgNames:       []string{"file"},
 		Executable:     false,
@@ -2051,6 +3123,7 @@ var (
 		Name:           "no-batch-file",
 		NameCamelCase:  "noBatchFile",
 		NamePascalCase: "NoBatchFile",
+		NameSnakeCase:  "no_batch_file",
 		DefaultFlag:    "--no-batch-file",
 		Executable:     false,
 		Help:           "Do not read URLs from batch file (default)",
@@ -2062,6 +3135,7 @@ var (
 		Name:           "id",
 		NameCamelCase:  "id",
 		NamePascalCase: "ID",
+		NameSnakeCase:  "id",
 		DefaultFlag:    "--id",
 		Executable:     false,
 		Deprecated:     "Use [Command.Output] with `%(id)s.%(ext)s` as an argument.",
@@ -2074,6 +3148,7 @@ var (
 		Name:           "paths",
 		NameCamelCase:  "paths",
 		NamePascalCase: "Paths",
+		NameSnakeCase:  "paths",
 		DefaultFlag:    "--paths",
 		ArgNames:       []string{"path"},
 		Executable:     false,
@@ -2089,10 +3164,11 @@ var (
 		Name:           "output",
 		NameCamelCase:  "output",
 		NamePascalCase: "Output",
+		NameSnakeCase:  "output",
 		URLs: []*OptionURL{
 			{
 				Name: "Output Template",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#output-template",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#output-template",
 			},
 		},
 		DefaultFlag: "--output",
@@ -2110,6 +3186,7 @@ var (
 		Name:           "output-na-placeholder",
 		NameCamelCase:  "outputNaPlaceholder",
 		NamePascalCase: "OutputNaPlaceholder",
+		NameSnakeCase:  "output_na_placeholder",
 		DefaultFlag:    "--output-na-placeholder",
 		ArgNames:       []string{"text"},
 		Executable:     false,
@@ -2124,6 +3201,7 @@ var (
 		Name:           "autonumber-size",
 		NameCamelCase:  "autoNumberSize",
 		NamePascalCase: "AutoNumberSize",
+		NameSnakeCase:  "autonumber_size",
 		DefaultFlag:    "--autonumber-size",
 		ArgNames:       []string{"number"},
 		Executable:     false,
@@ -2139,6 +3217,7 @@ var (
 		Name:           "autonumber-start",
 		NameCamelCase:  "autoNumberStart",
 		NamePascalCase: "AutoNumberStart",
+		NameSnakeCase:  "autonumber_start",
 		DefaultFlag:    "--autonumber-start",
 		ArgNames:       []string{"number"},
 		Executable:     false,
@@ -2154,6 +3233,7 @@ var (
 		Name:           "restrict-filenames",
 		NameCamelCase:  "restrictFilenames",
 		NamePascalCase: "RestrictFilenames",
+		NameSnakeCase:  "restrict_filenames",
 		DefaultFlag:    "--restrict-filenames",
 		Executable:     false,
 		Help:           "Restrict filenames to only ASCII characters, and avoid \"&\" and spaces in filenames",
@@ -2165,6 +3245,7 @@ var (
 		Name:           "no-restrict-filenames",
 		NameCamelCase:  "noRestrictFilenames",
 		NamePascalCase: "NoRestrictFilenames",
+		NameSnakeCase:  "no_restrict_filenames",
 		DefaultFlag:    "--no-restrict-filenames",
 		Executable:     false,
 		Help:           "Allow Unicode characters, \"&\" and spaces in filenames (default)",
@@ -2176,6 +3257,7 @@ var (
 		Name:           "windows-filenames",
 		NameCamelCase:  "windowsFilenames",
 		NamePascalCase: "WindowsFilenames",
+		NameSnakeCase:  "windows_filenames",
 		DefaultFlag:    "--windows-filenames",
 		Executable:     false,
 		Help:           "Force filenames to be Windows-compatible",
@@ -2187,6 +3269,7 @@ var (
 		Name:           "no-windows-filenames",
 		NameCamelCase:  "noWindowsFilenames",
 		NamePascalCase: "NoWindowsFilenames",
+		NameSnakeCase:  "no_windows_filenames",
 		DefaultFlag:    "--no-windows-filenames",
 		Executable:     false,
 		Help:           "Sanitize filenames only minimally",
@@ -2198,6 +3281,7 @@ var (
 		Name:           "trim-filenames",
 		NameCamelCase:  "trimFilenames",
 		NamePascalCase: "TrimFilenames",
+		NameSnakeCase:  "trim_filenames",
 		DefaultFlag:    "--trim-filenames",
 		ArgNames:       []string{"length"},
 		Executable:     false,
@@ -2212,6 +3296,7 @@ var (
 		Name:           "no-overwrites",
 		NameCamelCase:  "noOverwrites",
 		NamePascalCase: "NoOverwrites",
+		NameSnakeCase:  "no_overwrites",
 		DefaultFlag:    "--no-overwrites",
 		Executable:     false,
 		Help:           "Do not overwrite any files",
@@ -2224,6 +3309,7 @@ var (
 		Name:           "force-overwrites",
 		NameCamelCase:  "forceOverwrites",
 		NamePascalCase: "ForceOverwrites",
+		NameSnakeCase:  "force_overwrites",
 		DefaultFlag:    "--force-overwrites",
 		Executable:     false,
 		Help:           "Overwrite all video and metadata files. This option includes --no-continue",
@@ -2235,6 +3321,7 @@ var (
 		Name:           "no-force-overwrites",
 		NameCamelCase:  "noForceOverwrites",
 		NamePascalCase: "NoForceOverwrites",
+		NameSnakeCase:  "no_force_overwrites",
 		DefaultFlag:    "--no-force-overwrites",
 		Executable:     false,
 		Help:           "Do not overwrite the video, but overwrite related files (default)",
@@ -2246,6 +3333,7 @@ var (
 		Name:           "continue",
 		NameCamelCase:  "continue",
 		NamePascalCase: "Continue",
+		NameSnakeCase:  "continue",
 		DefaultFlag:    "--continue",
 		Executable:     false,
 		Help:           "Resume partially downloaded files/fragments (default)",
@@ -2258,6 +3346,7 @@ var (
 		Name:           "no-continue",
 		NameCamelCase:  "noContinue",
 		NamePascalCase: "NoContinue",
+		NameSnakeCase:  "no_continue",
 		DefaultFlag:    "--no-continue",
 		Executable:     false,
 		Help:           "Do not resume partially downloaded fragments. If the file is not fragmented, restart download of the entire file",
@@ -2269,6 +3358,7 @@ var (
 		Name:           "part",
 		NameCamelCase:  "part",
 		NamePascalCase: "Part",
+		NameSnakeCase:  "part",
 		DefaultFlag:    "--part",
 		Executable:     false,
 		Help:           "Use .part files instead of writing directly into output file (default)",
@@ -2280,6 +3370,7 @@ var (
 		Name:           "no-part",
 		NameCamelCase:  "noPart",
 		NamePascalCase: "NoPart",
+		NameSnakeCase:  "no_part",
 		DefaultFlag:    "--no-part",
 		Executable:     false,
 		Help:           "Do not use .part files - write directly into output file",
@@ -2291,9 +3382,10 @@ var (
 		Name:           "mtime",
 		NameCamelCase:  "mtime",
 		NamePascalCase: "Mtime",
+		NameSnakeCase:  "mtime",
 		DefaultFlag:    "--mtime",
 		Executable:     false,
-		Help:           "Use the Last-modified header to set the file modification time (default)",
+		Help:           "Use the Last-modified header to set the file modification time",
 		Type:           "bool",
 		LongFlags:      []string{"--mtime"},
 	}
@@ -2302,9 +3394,10 @@ var (
 		Name:           "no-mtime",
 		NameCamelCase:  "noMtime",
 		NamePascalCase: "NoMtime",
+		NameSnakeCase:  "no_mtime",
 		DefaultFlag:    "--no-mtime",
 		Executable:     false,
-		Help:           "Do not use the Last-modified header to set the file modification time",
+		Help:           "Do not use the Last-modified header to set the file modification time (default)",
 		Type:           "bool",
 		LongFlags:      []string{"--no-mtime"},
 	}
@@ -2313,6 +3406,7 @@ var (
 		Name:           "write-description",
 		NameCamelCase:  "writeDescription",
 		NamePascalCase: "WriteDescription",
+		NameSnakeCase:  "write_description",
 		DefaultFlag:    "--write-description",
 		Executable:     false,
 		Help:           "Write video description to a .description file",
@@ -2324,6 +3418,7 @@ var (
 		Name:           "no-write-description",
 		NameCamelCase:  "noWriteDescription",
 		NamePascalCase: "NoWriteDescription",
+		NameSnakeCase:  "no_write_description",
 		DefaultFlag:    "--no-write-description",
 		Executable:     false,
 		Help:           "Do not write video description (default)",
@@ -2335,6 +3430,7 @@ var (
 		Name:           "write-info-json",
 		NameCamelCase:  "writeInfoJSON",
 		NamePascalCase: "WriteInfoJSON",
+		NameSnakeCase:  "write_info_json",
 		DefaultFlag:    "--write-info-json",
 		Executable:     false,
 		Help:           "Write video metadata to a .info.json file (this may contain personal information)",
@@ -2346,41 +3442,19 @@ var (
 		Name:           "no-write-info-json",
 		NameCamelCase:  "noWriteInfoJSON",
 		NamePascalCase: "NoWriteInfoJSON",
+		NameSnakeCase:  "no_write_info_json",
 		DefaultFlag:    "--no-write-info-json",
 		Executable:     false,
 		Help:           "Do not write video metadata (default)",
 		Type:           "bool",
 		LongFlags:      []string{"--no-write-info-json"},
 	}
-	optionWriteAnnotations = &Option{
-		ID:             "writeannotations",
-		Name:           "write-annotations",
-		NameCamelCase:  "writeAnnotations",
-		NamePascalCase: "WriteAnnotations",
-		DefaultFlag:    "--write-annotations",
-		Executable:     false,
-		Deprecated:     "No supported site has annotations now.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--write-annotations"},
-	}
-	optionNoWriteAnnotations = &Option{
-		ID:             "writeannotations",
-		Name:           "no-write-annotations",
-		NameCamelCase:  "noWriteAnnotations",
-		NamePascalCase: "NoWriteAnnotations",
-		DefaultFlag:    "--no-write-annotations",
-		Executable:     false,
-		Deprecated:     "This flag is now default in yt-dlp.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--no-write-annotations"},
-	}
 	optionWritePlaylistMetafiles = &Option{
 		ID:             "allow_playlist_files",
 		Name:           "write-playlist-metafiles",
 		NameCamelCase:  "writePlaylistMetafiles",
 		NamePascalCase: "WritePlaylistMetafiles",
+		NameSnakeCase:  "write_playlist_metafiles",
 		DefaultFlag:    "--write-playlist-metafiles",
 		Executable:     false,
 		Help:           "Write playlist metadata in addition to the video metadata when using --write-info-json, --write-description etc. (default)",
@@ -2392,6 +3466,7 @@ var (
 		Name:           "no-write-playlist-metafiles",
 		NameCamelCase:  "noWritePlaylistMetafiles",
 		NamePascalCase: "NoWritePlaylistMetafiles",
+		NameSnakeCase:  "no_write_playlist_metafiles",
 		DefaultFlag:    "--no-write-playlist-metafiles",
 		Executable:     false,
 		Help:           "Do not write playlist metadata when using --write-info-json, --write-description etc.",
@@ -2403,6 +3478,7 @@ var (
 		Name:           "clean-info-json",
 		NameCamelCase:  "cleanInfoJSON",
 		NamePascalCase: "CleanInfoJSON",
+		NameSnakeCase:  "clean_info_json",
 		DefaultFlag:    "--clean-info-json",
 		Executable:     false,
 		Help:           "Remove some internal metadata such as filenames from the infojson (default)",
@@ -2414,6 +3490,7 @@ var (
 		Name:           "no-clean-info-json",
 		NameCamelCase:  "noCleanInfoJSON",
 		NamePascalCase: "NoCleanInfoJSON",
+		NameSnakeCase:  "no_clean_info_json",
 		DefaultFlag:    "--no-clean-info-json",
 		Executable:     false,
 		Help:           "Write all fields to the infojson",
@@ -2425,6 +3502,7 @@ var (
 		Name:           "write-comments",
 		NameCamelCase:  "writeComments",
 		NamePascalCase: "WriteComments",
+		NameSnakeCase:  "write_comments",
 		DefaultFlag:    "--write-comments",
 		Executable:     false,
 		Help:           "Retrieve video comments to be placed in the infojson. The comments are fetched even without this option if the extraction is known to be quick",
@@ -2436,6 +3514,7 @@ var (
 		Name:           "no-write-comments",
 		NameCamelCase:  "noWriteComments",
 		NamePascalCase: "NoWriteComments",
+		NameSnakeCase:  "no_write_comments",
 		DefaultFlag:    "--no-write-comments",
 		Executable:     false,
 		Help:           "Do not retrieve video comments unless the extraction is known to be quick",
@@ -2447,13 +3526,14 @@ var (
 		Name:           "load-info-json",
 		NameCamelCase:  "loadInfoJSON",
 		NamePascalCase: "LoadInfoJSON",
+		NameSnakeCase:  "load_info_json",
 		DefaultFlag:    "--load-info-json",
 		ArgNames:       []string{"file"},
 		Executable:     false,
 		Help:           "JSON file containing the video information (created with the \"--write-info-json\" option)",
 		MetaArgs:       "FILE",
 		Type:           "string",
-		LongFlags:      []string{"--load-info-json", "--load-info"},
+		LongFlags:      []string{"--load-info-json"},
 		NArgs:          1,
 	}
 	optionCookies = &Option{
@@ -2461,6 +3541,7 @@ var (
 		Name:           "cookies",
 		NameCamelCase:  "cookies",
 		NamePascalCase: "Cookies",
+		NameSnakeCase:  "cookies",
 		DefaultFlag:    "--cookies",
 		ArgNames:       []string{"file"},
 		Executable:     false,
@@ -2475,6 +3556,7 @@ var (
 		Name:           "no-cookies",
 		NameCamelCase:  "noCookies",
 		NamePascalCase: "NoCookies",
+		NameSnakeCase:  "no_cookies",
 		DefaultFlag:    "--no-cookies",
 		Executable:     false,
 		Help:           "Do not read/dump cookies from/to file (default)",
@@ -2487,6 +3569,7 @@ var (
 		Name:           "cookies-from-browser",
 		NameCamelCase:  "cookiesFromBrowser",
 		NamePascalCase: "CookiesFromBrowser",
+		NameSnakeCase:  "cookies_from_browser",
 		DefaultFlag:    "--cookies-from-browser",
 		ArgNames:       []string{"browser"},
 		Executable:     false,
@@ -2501,6 +3584,7 @@ var (
 		Name:           "no-cookies-from-browser",
 		NameCamelCase:  "noCookiesFromBrowser",
 		NamePascalCase: "NoCookiesFromBrowser",
+		NameSnakeCase:  "no_cookies_from_browser",
 		DefaultFlag:    "--no-cookies-from-browser",
 		Executable:     false,
 		Help:           "Do not load cookies from browser (default)",
@@ -2512,6 +3596,7 @@ var (
 		Name:           "cache-dir",
 		NameCamelCase:  "cacheDir",
 		NamePascalCase: "CacheDir",
+		NameSnakeCase:  "cache_dir",
 		DefaultFlag:    "--cache-dir",
 		ArgNames:       []string{"dir"},
 		Executable:     false,
@@ -2526,6 +3611,7 @@ var (
 		Name:           "no-cache-dir",
 		NameCamelCase:  "noCacheDir",
 		NamePascalCase: "NoCacheDir",
+		NameSnakeCase:  "no_cache_dir",
 		DefaultFlag:    "--no-cache-dir",
 		Executable:     false,
 		Help:           "Disable filesystem caching",
@@ -2537,6 +3623,7 @@ var (
 		Name:           "rm-cache-dir",
 		NameCamelCase:  "rmCacheDir",
 		NamePascalCase: "RmCacheDir",
+		NameSnakeCase:  "rm_cache_dir",
 		DefaultFlag:    "--rm-cache-dir",
 		Executable:     false,
 		Help:           "Delete all filesystem cache files",
@@ -2548,6 +3635,7 @@ var (
 		Name:           "write-thumbnail",
 		NameCamelCase:  "writeThumbnail",
 		NamePascalCase: "WriteThumbnail",
+		NameSnakeCase:  "write_thumbnail",
 		DefaultFlag:    "--write-thumbnail",
 		Executable:     false,
 		Help:           "Write thumbnail image to disk",
@@ -2559,6 +3647,7 @@ var (
 		Name:           "no-write-thumbnail",
 		NameCamelCase:  "noWriteThumbnail",
 		NamePascalCase: "NoWriteThumbnail",
+		NameSnakeCase:  "no_write_thumbnail",
 		DefaultFlag:    "--no-write-thumbnail",
 		Executable:     false,
 		Help:           "Do not write thumbnail image to disk (default)",
@@ -2570,6 +3659,7 @@ var (
 		Name:           "write-all-thumbnails",
 		NameCamelCase:  "writeAllThumbnails",
 		NamePascalCase: "WriteAllThumbnails",
+		NameSnakeCase:  "write_all_thumbnails",
 		DefaultFlag:    "--write-all-thumbnails",
 		Executable:     false,
 		Help:           "Write all thumbnail image formats to disk",
@@ -2581,6 +3671,7 @@ var (
 		Name:           "list-thumbnails",
 		NameCamelCase:  "listThumbnails",
 		NamePascalCase: "ListThumbnails",
+		NameSnakeCase:  "list_thumbnails",
 		DefaultFlag:    "--list-thumbnails",
 		Executable:     false,
 		Deprecated:     "Call [Command.Print] twice, once with `thumbnails_table` as an argument, then with `playlist:thumbnails_table` as an argument.",
@@ -2593,6 +3684,7 @@ var (
 		Name:           "write-link",
 		NameCamelCase:  "writeLink",
 		NamePascalCase: "WriteLink",
+		NameSnakeCase:  "write_link",
 		DefaultFlag:    "--write-link",
 		Executable:     false,
 		Help:           "Write an internet shortcut file, depending on the current platform (.url, .webloc or .desktop). The URL may be cached by the OS",
@@ -2604,6 +3696,7 @@ var (
 		Name:           "write-url-link",
 		NameCamelCase:  "writeURLLink",
 		NamePascalCase: "WriteURLLink",
+		NameSnakeCase:  "write_url_link",
 		DefaultFlag:    "--write-url-link",
 		Executable:     false,
 		Help:           "Write a .url Windows internet shortcut. The OS caches the URL based on the file path",
@@ -2615,6 +3708,7 @@ var (
 		Name:           "write-webloc-link",
 		NameCamelCase:  "writeWeblocLink",
 		NamePascalCase: "WriteWeblocLink",
+		NameSnakeCase:  "write_webloc_link",
 		DefaultFlag:    "--write-webloc-link",
 		Executable:     false,
 		Help:           "Write a .webloc macOS internet shortcut",
@@ -2626,6 +3720,7 @@ var (
 		Name:           "write-desktop-link",
 		NameCamelCase:  "writeDesktopLink",
 		NamePascalCase: "WriteDesktopLink",
+		NameSnakeCase:  "write_desktop_link",
 		DefaultFlag:    "--write-desktop-link",
 		Executable:     false,
 		Help:           "Write a .desktop Linux internet shortcut",
@@ -2637,6 +3732,7 @@ var (
 		Name:           "quiet",
 		NameCamelCase:  "quiet",
 		NamePascalCase: "Quiet",
+		NameSnakeCase:  "quiet",
 		DefaultFlag:    "--quiet",
 		Executable:     false,
 		Help:           "Activate quiet mode. If used with --verbose, print the log to stderr",
@@ -2649,6 +3745,7 @@ var (
 		Name:           "no-quiet",
 		NameCamelCase:  "noQuiet",
 		NamePascalCase: "NoQuiet",
+		NameSnakeCase:  "no_quiet",
 		DefaultFlag:    "--no-quiet",
 		Executable:     false,
 		Help:           "Deactivate quiet mode. (Default)",
@@ -2660,6 +3757,7 @@ var (
 		Name:           "no-warnings",
 		NameCamelCase:  "noWarnings",
 		NamePascalCase: "NoWarnings",
+		NameSnakeCase:  "no_warnings",
 		DefaultFlag:    "--no-warnings",
 		Executable:     false,
 		Help:           "Ignore warnings",
@@ -2671,6 +3769,7 @@ var (
 		Name:           "simulate",
 		NameCamelCase:  "simulate",
 		NamePascalCase: "Simulate",
+		NameSnakeCase:  "simulate",
 		DefaultFlag:    "--simulate",
 		Executable:     false,
 		Help:           "Do not download the video and do not write anything to disk",
@@ -2683,6 +3782,7 @@ var (
 		Name:           "no-simulate",
 		NameCamelCase:  "noSimulate",
 		NamePascalCase: "NoSimulate",
+		NameSnakeCase:  "no_simulate",
 		DefaultFlag:    "--no-simulate",
 		Executable:     false,
 		Help:           "Download the video even if printing/listing options are used",
@@ -2694,6 +3794,7 @@ var (
 		Name:           "ignore-no-formats-error",
 		NameCamelCase:  "ignoreNoFormatsError",
 		NamePascalCase: "IgnoreNoFormatsError",
+		NameSnakeCase:  "ignore_no_formats_error",
 		DefaultFlag:    "--ignore-no-formats-error",
 		Executable:     false,
 		Help:           "Ignore \"No video formats\" error. Useful for extracting metadata even if the videos are not actually available for download (experimental)",
@@ -2705,6 +3806,7 @@ var (
 		Name:           "no-ignore-no-formats-error",
 		NameCamelCase:  "noIgnoreNoFormatsError",
 		NamePascalCase: "NoIgnoreNoFormatsError",
+		NameSnakeCase:  "no_ignore_no_formats_error",
 		DefaultFlag:    "--no-ignore-no-formats-error",
 		Executable:     false,
 		Help:           "Throw error when no downloadable video formats are found (default)",
@@ -2716,6 +3818,7 @@ var (
 		Name:           "skip-download",
 		NameCamelCase:  "skipDownload",
 		NamePascalCase: "SkipDownload",
+		NameSnakeCase:  "skip_download",
 		DefaultFlag:    "--skip-download",
 		Executable:     false,
 		Help:           "Do not download the video but write all related files",
@@ -2727,6 +3830,7 @@ var (
 		Name:           "print",
 		NameCamelCase:  "print",
 		NamePascalCase: "Print",
+		NameSnakeCase:  "print",
 		DefaultFlag:    "--print",
 		ArgNames:       []string{"template"},
 		Executable:     false,
@@ -2742,6 +3846,7 @@ var (
 		Name:           "print-to-file",
 		NameCamelCase:  "printToFile",
 		NamePascalCase: "PrintToFile",
+		NameSnakeCase:  "print_to_file",
 		DefaultFlag:    "--print-to-file",
 		ArgNames:       []string{"template", "file"},
 		Executable:     false,
@@ -2756,6 +3861,7 @@ var (
 		Name:           "get-url",
 		NameCamelCase:  "getURL",
 		NamePascalCase: "GetURL",
+		NameSnakeCase:  "get_url",
 		DefaultFlag:    "--get-url",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `urls` as an argument.",
@@ -2769,6 +3875,7 @@ var (
 		Name:           "get-title",
 		NameCamelCase:  "getTitle",
 		NamePascalCase: "GetTitle",
+		NameSnakeCase:  "get_title",
 		DefaultFlag:    "--get-title",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `title` as an argument.",
@@ -2782,6 +3889,7 @@ var (
 		Name:           "get-id",
 		NameCamelCase:  "getID",
 		NamePascalCase: "GetID",
+		NameSnakeCase:  "get_id",
 		DefaultFlag:    "--get-id",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `id` as an argument.",
@@ -2794,6 +3902,7 @@ var (
 		Name:           "get-thumbnail",
 		NameCamelCase:  "getThumbnail",
 		NamePascalCase: "GetThumbnail",
+		NameSnakeCase:  "get_thumbnail",
 		DefaultFlag:    "--get-thumbnail",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `thumbnail` as an argument.",
@@ -2806,6 +3915,7 @@ var (
 		Name:           "get-description",
 		NameCamelCase:  "getDescription",
 		NamePascalCase: "GetDescription",
+		NameSnakeCase:  "get_description",
 		DefaultFlag:    "--get-description",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `description` as an argument.",
@@ -2818,6 +3928,7 @@ var (
 		Name:           "get-duration",
 		NameCamelCase:  "getDuration",
 		NamePascalCase: "GetDuration",
+		NameSnakeCase:  "get_duration",
 		DefaultFlag:    "--get-duration",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `duration_string` as an argument.",
@@ -2830,6 +3941,7 @@ var (
 		Name:           "get-filename",
 		NameCamelCase:  "getFilename",
 		NamePascalCase: "GetFilename",
+		NameSnakeCase:  "get_filename",
 		DefaultFlag:    "--get-filename",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `filename` as an argument.",
@@ -2842,6 +3954,7 @@ var (
 		Name:           "get-format",
 		NameCamelCase:  "getFormat",
 		NamePascalCase: "GetFormat",
+		NameSnakeCase:  "get_format",
 		DefaultFlag:    "--get-format",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `format` as an argument.",
@@ -2854,10 +3967,11 @@ var (
 		Name:           "dump-json",
 		NameCamelCase:  "dumpJSON",
 		NamePascalCase: "DumpJSON",
+		NameSnakeCase:  "dump_json",
 		URLs: []*OptionURL{
 			{
 				Name: "Output Template",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#output-template",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#output-template",
 			},
 		},
 		DefaultFlag: "--dump-json",
@@ -2872,6 +3986,7 @@ var (
 		Name:           "dump-single-json",
 		NameCamelCase:  "dumpSingleJSON",
 		NamePascalCase: "DumpSingleJSON",
+		NameSnakeCase:  "dump_single_json",
 		DefaultFlag:    "--dump-single-json",
 		Executable:     false,
 		Help:           "Quiet, but print JSON information for each URL or infojson passed. Simulate unless --no-simulate is used. If the URL refers to a playlist, the whole playlist information is dumped in a single line",
@@ -2884,6 +3999,7 @@ var (
 		Name:           "print-json",
 		NameCamelCase:  "printJSON",
 		NamePascalCase: "PrintJSON",
+		NameSnakeCase:  "print_json",
 		DefaultFlag:    "--print-json",
 		Executable:     false,
 		Hidden:         true,
@@ -2895,6 +4011,7 @@ var (
 		Name:           "force-write-archive",
 		NameCamelCase:  "forceWriteArchive",
 		NamePascalCase: "ForceWriteArchive",
+		NameSnakeCase:  "force_write_archive",
 		DefaultFlag:    "--force-write-archive",
 		Executable:     false,
 		Help:           "Force download archive entries to be written as far as no errors occur, even if -s or another simulation option is used",
@@ -2906,6 +4023,7 @@ var (
 		Name:           "newline",
 		NameCamelCase:  "newline",
 		NamePascalCase: "Newline",
+		NameSnakeCase:  "newline",
 		DefaultFlag:    "--newline",
 		Executable:     false,
 		Help:           "Output progress bar as new lines",
@@ -2917,6 +4035,7 @@ var (
 		Name:           "no-progress",
 		NameCamelCase:  "noProgress",
 		NamePascalCase: "NoProgress",
+		NameSnakeCase:  "no_progress",
 		DefaultFlag:    "--no-progress",
 		Executable:     false,
 		Help:           "Do not print progress bar",
@@ -2928,6 +4047,7 @@ var (
 		Name:           "progress",
 		NameCamelCase:  "progress",
 		NamePascalCase: "Progress",
+		NameSnakeCase:  "progress",
 		DefaultFlag:    "--progress",
 		Executable:     false,
 		Help:           "Show progress bar, even if in quiet mode",
@@ -2939,6 +4059,7 @@ var (
 		Name:           "console-title",
 		NameCamelCase:  "consoleTitle",
 		NamePascalCase: "ConsoleTitle",
+		NameSnakeCase:  "console_title",
 		DefaultFlag:    "--console-title",
 		Executable:     false,
 		Help:           "Display progress in console titlebar",
@@ -2950,6 +4071,7 @@ var (
 		Name:           "progress-template",
 		NameCamelCase:  "progressTemplate",
 		NamePascalCase: "ProgressTemplate",
+		NameSnakeCase:  "progress_template",
 		DefaultFlag:    "--progress-template",
 		ArgNames:       []string{"template"},
 		Executable:     false,
@@ -2964,6 +4086,7 @@ var (
 		Name:           "progress-delta",
 		NameCamelCase:  "progressDelta",
 		NamePascalCase: "ProgressDelta",
+		NameSnakeCase:  "progress_delta",
 		DefaultFlag:    "--progress-delta",
 		ArgNames:       []string{"seconds"},
 		Executable:     false,
@@ -2978,6 +4101,7 @@ var (
 		Name:           "verbose",
 		NameCamelCase:  "verbose",
 		NamePascalCase: "Verbose",
+		NameSnakeCase:  "verbose",
 		DefaultFlag:    "--verbose",
 		Executable:     false,
 		Help:           "Print various debugging information",
@@ -2990,17 +4114,19 @@ var (
 		Name:           "dump-pages",
 		NameCamelCase:  "dumpPages",
 		NamePascalCase: "DumpPages",
+		NameSnakeCase:  "dump_pages",
 		DefaultFlag:    "--dump-pages",
 		Executable:     false,
 		Help:           "Print downloaded pages encoded using base64 to debug problems (very verbose)",
 		Type:           "bool",
-		LongFlags:      []string{"--dump-pages", "--dump-intermediate-pages"},
+		LongFlags:      []string{"--dump-pages"},
 	}
 	optionWritePages = &Option{
 		ID:             "write_pages",
 		Name:           "write-pages",
 		NameCamelCase:  "writePages",
 		NamePascalCase: "WritePages",
+		NameSnakeCase:  "write_pages",
 		DefaultFlag:    "--write-pages",
 		Executable:     false,
 		Help:           "Write downloaded intermediary pages to files in the current directory to debug problems",
@@ -3012,42 +4138,19 @@ var (
 		Name:           "print-traffic",
 		NameCamelCase:  "printTraffic",
 		NamePascalCase: "PrintTraffic",
+		NameSnakeCase:  "print_traffic",
 		DefaultFlag:    "--print-traffic",
 		Executable:     false,
 		Help:           "Display sent and read HTTP traffic",
 		Type:           "bool",
-		LongFlags:      []string{"--print-traffic", "--dump-headers"},
-	}
-	optionCallHome = &Option{
-		ID:             "call_home",
-		Name:           "call-home",
-		NameCamelCase:  "callHome",
-		NamePascalCase: "CallHome",
-		DefaultFlag:    "--call-home",
-		Executable:     false,
-		Deprecated:     "Not implemented.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--call-home"},
-		ShortFlags:     []string{"-C"},
-	}
-	optionNoCallHome = &Option{
-		ID:             "call_home",
-		Name:           "no-call-home",
-		NameCamelCase:  "noCallHome",
-		NamePascalCase: "NoCallHome",
-		DefaultFlag:    "--no-call-home",
-		Executable:     false,
-		Deprecated:     "This flag is now default in yt-dlp.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--no-call-home"},
+		LongFlags:      []string{"--print-traffic"},
 	}
 	optionEncoding = &Option{
 		ID:             "encoding",
 		Name:           "encoding",
 		NameCamelCase:  "encoding",
 		NamePascalCase: "Encoding",
+		NameSnakeCase:  "encoding",
 		DefaultFlag:    "--encoding",
 		ArgNames:       []string{"encoding"},
 		Executable:     false,
@@ -3062,6 +4165,7 @@ var (
 		Name:           "legacy-server-connect",
 		NameCamelCase:  "legacyServerConnect",
 		NamePascalCase: "LegacyServerConnect",
+		NameSnakeCase:  "legacy_server_connect",
 		DefaultFlag:    "--legacy-server-connect",
 		Executable:     false,
 		Help:           "Explicitly allow HTTPS connection to servers that do not support RFC 5746 secure renegotiation",
@@ -3073,6 +4177,7 @@ var (
 		Name:           "no-check-certificates",
 		NameCamelCase:  "noCheckCertificates",
 		NamePascalCase: "NoCheckCertificates",
+		NameSnakeCase:  "no_check_certificates",
 		DefaultFlag:    "--no-check-certificates",
 		Executable:     false,
 		Help:           "Suppress HTTPS certificate validation",
@@ -3084,6 +4189,7 @@ var (
 		Name:           "prefer-insecure",
 		NameCamelCase:  "preferInsecure",
 		NamePascalCase: "PreferInsecure",
+		NameSnakeCase:  "prefer_insecure",
 		DefaultFlag:    "--prefer-insecure",
 		Executable:     false,
 		Help:           "Use an unencrypted connection to retrieve information about the video (Currently supported only for YouTube)",
@@ -3095,6 +4201,7 @@ var (
 		Name:           "user-agent",
 		NameCamelCase:  "userAgent",
 		NamePascalCase: "UserAgent",
+		NameSnakeCase:  "user_agent",
 		DefaultFlag:    "--user-agent",
 		ArgNames:       []string{"ua"},
 		Executable:     false,
@@ -3110,6 +4217,7 @@ var (
 		Name:           "referer",
 		NameCamelCase:  "referer",
 		NamePascalCase: "Referer",
+		NameSnakeCase:  "referer",
 		DefaultFlag:    "--referer",
 		ArgNames:       []string{"url"},
 		Executable:     false,
@@ -3125,6 +4233,7 @@ var (
 		Name:           "add-headers",
 		NameCamelCase:  "addHeaders",
 		NamePascalCase: "AddHeaders",
+		NameSnakeCase:  "add_headers",
 		DefaultFlag:    "--add-headers",
 		ArgNames:       []string{"fieldvalue"},
 		Executable:     false,
@@ -3139,6 +4248,7 @@ var (
 		Name:           "bidi-workaround",
 		NameCamelCase:  "bidiWorkaround",
 		NamePascalCase: "BidiWorkaround",
+		NameSnakeCase:  "bidi_workaround",
 		DefaultFlag:    "--bidi-workaround",
 		Executable:     false,
 		Help:           "Work around terminals that lack bidirectional text support. Requires bidiv or fribidi executable in PATH",
@@ -3150,6 +4260,7 @@ var (
 		Name:           "sleep-requests",
 		NameCamelCase:  "sleepRequests",
 		NamePascalCase: "SleepRequests",
+		NameSnakeCase:  "sleep_requests",
 		DefaultFlag:    "--sleep-requests",
 		ArgNames:       []string{"seconds"},
 		Executable:     false,
@@ -3164,6 +4275,7 @@ var (
 		Name:           "sleep-interval",
 		NameCamelCase:  "sleepInterval",
 		NamePascalCase: "SleepInterval",
+		NameSnakeCase:  "sleep_interval",
 		DefaultFlag:    "--sleep-interval",
 		ArgNames:       []string{"seconds"},
 		Executable:     false,
@@ -3178,6 +4290,7 @@ var (
 		Name:           "max-sleep-interval",
 		NameCamelCase:  "maxSleepInterval",
 		NamePascalCase: "MaxSleepInterval",
+		NameSnakeCase:  "max_sleep_interval",
 		DefaultFlag:    "--max-sleep-interval",
 		ArgNames:       []string{"seconds"},
 		Executable:     false,
@@ -3192,12 +4305,13 @@ var (
 		Name:           "sleep-subtitles",
 		NameCamelCase:  "sleepSubtitles",
 		NamePascalCase: "SleepSubtitles",
+		NameSnakeCase:  "sleep_subtitles",
 		DefaultFlag:    "--sleep-subtitles",
 		ArgNames:       []string{"seconds"},
 		Executable:     false,
 		Help:           "Number of seconds to sleep before each subtitle download",
 		MetaArgs:       "SECONDS",
-		Type:           "int",
+		Type:           "float64",
 		LongFlags:      []string{"--sleep-subtitles"},
 		NArgs:          1,
 	}
@@ -3206,18 +4320,19 @@ var (
 		Name:           "format",
 		NameCamelCase:  "format",
 		NamePascalCase: "Format",
+		NameSnakeCase:  "format",
 		URLs: []*OptionURL{
 			{
 				Name: "Format Selection",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#format-selection",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#format-selection",
 			},
 			{
 				Name: "Filter Formatting",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#filtering-formats",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#filtering-formats",
 			},
 			{
 				Name: "Format Selection Examples",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#format-selection-examples",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#format-selection-examples",
 			},
 		},
 		DefaultFlag: "--format",
@@ -3235,14 +4350,15 @@ var (
 		Name:           "format-sort",
 		NameCamelCase:  "formatSort",
 		NamePascalCase: "FormatSort",
+		NameSnakeCase:  "format_sort",
 		URLs: []*OptionURL{
 			{
 				Name: "Sorting Formats",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#sorting-formats",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#sorting-formats",
 			},
 			{
 				Name: "Format Selection Examples",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#format-selection-examples",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#format-selection-examples",
 			},
 		},
 		DefaultFlag: "--format-sort",
@@ -3260,10 +4376,11 @@ var (
 		Name:           "format-sort-force",
 		NameCamelCase:  "formatSortForce",
 		NamePascalCase: "FormatSortForce",
+		NameSnakeCase:  "format_sort_force",
 		URLs: []*OptionURL{
 			{
 				Name: "Sorting Formats",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#sorting-formats",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#sorting-formats",
 			},
 		},
 		DefaultFlag: "--format-sort-force",
@@ -3278,6 +4395,7 @@ var (
 		Name:           "no-format-sort-force",
 		NameCamelCase:  "noFormatSortForce",
 		NamePascalCase: "NoFormatSortForce",
+		NameSnakeCase:  "no_format_sort_force",
 		DefaultFlag:    "--no-format-sort-force",
 		Executable:     false,
 		Help:           "Some fields have precedence over the user specified sort order (default)",
@@ -3290,10 +4408,11 @@ var (
 		Name:           "video-multistreams",
 		NameCamelCase:  "videoMultistreams",
 		NamePascalCase: "VideoMultistreams",
+		NameSnakeCase:  "video_multistreams",
 		URLs: []*OptionURL{
 			{
 				Name: "Format Selection",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#format-selection",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#format-selection",
 			},
 		},
 		DefaultFlag: "--video-multistreams",
@@ -3307,6 +4426,7 @@ var (
 		Name:           "no-video-multistreams",
 		NameCamelCase:  "noVideoMultistreams",
 		NamePascalCase: "NoVideoMultistreams",
+		NameSnakeCase:  "no_video_multistreams",
 		DefaultFlag:    "--no-video-multistreams",
 		Executable:     false,
 		Help:           "Only one video stream is downloaded for each output file (default)",
@@ -3318,10 +4438,11 @@ var (
 		Name:           "audio-multistreams",
 		NameCamelCase:  "audioMultistreams",
 		NamePascalCase: "AudioMultistreams",
+		NameSnakeCase:  "audio_multistreams",
 		URLs: []*OptionURL{
 			{
 				Name: "Format Selection",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#format-selection",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#format-selection",
 			},
 		},
 		DefaultFlag: "--audio-multistreams",
@@ -3335,6 +4456,7 @@ var (
 		Name:           "no-audio-multistreams",
 		NameCamelCase:  "noAudioMultistreams",
 		NamePascalCase: "NoAudioMultistreams",
+		NameSnakeCase:  "no_audio_multistreams",
 		DefaultFlag:    "--no-audio-multistreams",
 		Executable:     false,
 		Help:           "Only one audio stream is downloaded for each output file (default)",
@@ -3346,6 +4468,7 @@ var (
 		Name:           "all-formats",
 		NameCamelCase:  "allFormats",
 		NamePascalCase: "AllFormats",
+		NameSnakeCase:  "all_formats",
 		DefaultFlag:    "--all-formats",
 		Executable:     false,
 		Deprecated:     "Use [Command.Format] with `all` as an argument.",
@@ -3358,6 +4481,7 @@ var (
 		Name:           "prefer-free-formats",
 		NameCamelCase:  "preferFreeFormats",
 		NamePascalCase: "PreferFreeFormats",
+		NameSnakeCase:  "prefer_free_formats",
 		DefaultFlag:    "--prefer-free-formats",
 		Executable:     false,
 		Help:           "Prefer video formats with free containers over non-free ones of the same quality. Use with \"-S ext\" to strictly prefer free containers irrespective of quality",
@@ -3369,6 +4493,7 @@ var (
 		Name:           "no-prefer-free-formats",
 		NameCamelCase:  "noPreferFreeFormats",
 		NamePascalCase: "NoPreferFreeFormats",
+		NameSnakeCase:  "no_prefer_free_formats",
 		DefaultFlag:    "--no-prefer-free-formats",
 		Executable:     false,
 		Help:           "Don't give any special preference to free containers (default)",
@@ -3380,6 +4505,7 @@ var (
 		Name:           "check-formats",
 		NameCamelCase:  "checkFormats",
 		NamePascalCase: "CheckFormats",
+		NameSnakeCase:  "check_formats",
 		DefaultFlag:    "--check-formats",
 		Executable:     false,
 		Help:           "Make sure formats are selected only from those that are actually downloadable",
@@ -3391,6 +4517,7 @@ var (
 		Name:           "check-all-formats",
 		NameCamelCase:  "checkAllFormats",
 		NamePascalCase: "CheckAllFormats",
+		NameSnakeCase:  "check_all_formats",
 		DefaultFlag:    "--check-all-formats",
 		Executable:     false,
 		Help:           "Check all formats for whether they are actually downloadable",
@@ -3402,6 +4529,7 @@ var (
 		Name:           "no-check-formats",
 		NameCamelCase:  "noCheckFormats",
 		NamePascalCase: "NoCheckFormats",
+		NameSnakeCase:  "no_check_formats",
 		DefaultFlag:    "--no-check-formats",
 		Executable:     false,
 		Help:           "Do not check that the formats are actually downloadable",
@@ -3413,6 +4541,7 @@ var (
 		Name:           "list-formats",
 		NameCamelCase:  "listFormats",
 		NamePascalCase: "ListFormats",
+		NameSnakeCase:  "list_formats",
 		DefaultFlag:    "--list-formats",
 		Executable:     false,
 		Deprecated:     "Use [Command.Print] with `formats_table` as an argument.",
@@ -3426,6 +4555,7 @@ var (
 		Name:           "list-formats-as-table",
 		NameCamelCase:  "listFormatsAsTable",
 		NamePascalCase: "ListFormatsAsTable",
+		NameSnakeCase:  "list_formats_as_table",
 		DefaultFlag:    "--list-formats-as-table",
 		Executable:     false,
 		Deprecated:     "Use [Command.ListFormatsAsTable] or [Command.CompatOptions] with `-list-formats` as an argument.",
@@ -3438,6 +4568,7 @@ var (
 		Name:           "list-formats-old",
 		NameCamelCase:  "listFormatsOld",
 		NamePascalCase: "ListFormatsOld",
+		NameSnakeCase:  "list_formats_old",
 		DefaultFlag:    "--list-formats-old",
 		Executable:     false,
 		Deprecated:     "Use [Command.CompatOptions] with `list-formats` as an argument.",
@@ -3450,6 +4581,7 @@ var (
 		Name:           "merge-output-format",
 		NameCamelCase:  "mergeOutputFormat",
 		NamePascalCase: "MergeOutputFormat",
+		NameSnakeCase:  "merge_output_format",
 		DefaultFlag:    "--merge-output-format",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -3464,6 +4596,7 @@ var (
 		Name:           "write-subs",
 		NameCamelCase:  "writeSubs",
 		NamePascalCase: "WriteSubs",
+		NameSnakeCase:  "write_subs",
 		DefaultFlag:    "--write-subs",
 		Executable:     false,
 		Help:           "Write subtitle file",
@@ -3475,6 +4608,7 @@ var (
 		Name:           "no-write-subs",
 		NameCamelCase:  "noWriteSubs",
 		NamePascalCase: "NoWriteSubs",
+		NameSnakeCase:  "no_write_subs",
 		DefaultFlag:    "--no-write-subs",
 		Executable:     false,
 		Help:           "Do not write subtitle file (default)",
@@ -3486,6 +4620,7 @@ var (
 		Name:           "write-auto-subs",
 		NameCamelCase:  "writeAutoSubs",
 		NamePascalCase: "WriteAutoSubs",
+		NameSnakeCase:  "write_auto_subs",
 		DefaultFlag:    "--write-auto-subs",
 		Executable:     false,
 		Help:           "Write automatically generated subtitle file",
@@ -3497,6 +4632,7 @@ var (
 		Name:           "no-write-auto-subs",
 		NameCamelCase:  "noWriteAutoSubs",
 		NamePascalCase: "NoWriteAutoSubs",
+		NameSnakeCase:  "no_write_auto_subs",
 		DefaultFlag:    "--no-write-auto-subs",
 		Executable:     false,
 		Help:           "Do not write auto-generated subtitles (default)",
@@ -3508,6 +4644,7 @@ var (
 		Name:           "all-subs",
 		NameCamelCase:  "allSubs",
 		NamePascalCase: "AllSubs",
+		NameSnakeCase:  "all_subs",
 		DefaultFlag:    "--all-subs",
 		Executable:     false,
 		Deprecated:     "Use [Command.SubLangs] with `all` as an argument, in addition to [Command.WriteSubs].",
@@ -3520,6 +4657,7 @@ var (
 		Name:           "list-subs",
 		NameCamelCase:  "listSubs",
 		NamePascalCase: "ListSubs",
+		NameSnakeCase:  "list_subs",
 		DefaultFlag:    "--list-subs",
 		Executable:     false,
 		Help:           "List available subtitles of each video. Simulate unless --no-simulate is used",
@@ -3531,6 +4669,7 @@ var (
 		Name:           "sub-format",
 		NameCamelCase:  "subFormat",
 		NamePascalCase: "SubFormat",
+		NameSnakeCase:  "sub_format",
 		DefaultFlag:    "--sub-format",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -3545,6 +4684,7 @@ var (
 		Name:           "sub-langs",
 		NameCamelCase:  "subLangs",
 		NamePascalCase: "SubLangs",
+		NameSnakeCase:  "sub_langs",
 		DefaultFlag:    "--sub-langs",
 		ArgNames:       []string{"langs"},
 		Executable:     false,
@@ -3559,6 +4699,7 @@ var (
 		Name:           "username",
 		NameCamelCase:  "username",
 		NamePascalCase: "Username",
+		NameSnakeCase:  "username",
 		DefaultFlag:    "--username",
 		ArgNames:       []string{"username"},
 		Executable:     false,
@@ -3574,6 +4715,7 @@ var (
 		Name:           "password",
 		NameCamelCase:  "password",
 		NamePascalCase: "Password",
+		NameSnakeCase:  "password",
 		DefaultFlag:    "--password",
 		ArgNames:       []string{"password"},
 		Executable:     false,
@@ -3589,6 +4731,7 @@ var (
 		Name:           "twofactor",
 		NameCamelCase:  "twoFactor",
 		NamePascalCase: "TwoFactor",
+		NameSnakeCase:  "twofactor",
 		DefaultFlag:    "--twofactor",
 		ArgNames:       []string{"twofactor"},
 		Executable:     false,
@@ -3604,6 +4747,7 @@ var (
 		Name:           "netrc",
 		NameCamelCase:  "netrc",
 		NamePascalCase: "Netrc",
+		NameSnakeCase:  "netrc",
 		DefaultFlag:    "--netrc",
 		Executable:     false,
 		Help:           "Use .netrc authentication data",
@@ -3616,6 +4760,7 @@ var (
 		Name:           "netrc-location",
 		NameCamelCase:  "netrcLocation",
 		NamePascalCase: "NetrcLocation",
+		NameSnakeCase:  "netrc_location",
 		DefaultFlag:    "--netrc-location",
 		ArgNames:       []string{"path"},
 		Executable:     false,
@@ -3630,6 +4775,7 @@ var (
 		Name:           "netrc-cmd",
 		NameCamelCase:  "netrcCmd",
 		NamePascalCase: "NetrcCmd",
+		NameSnakeCase:  "netrc_cmd",
 		DefaultFlag:    "--netrc-cmd",
 		ArgNames:       []string{"netrcCmd"},
 		Executable:     false,
@@ -3644,6 +4790,7 @@ var (
 		Name:           "video-password",
 		NameCamelCase:  "videoPassword",
 		NamePascalCase: "VideoPassword",
+		NameSnakeCase:  "video_password",
 		DefaultFlag:    "--video-password",
 		ArgNames:       []string{"password"},
 		Executable:     false,
@@ -3658,6 +4805,7 @@ var (
 		Name:           "ap-mso",
 		NameCamelCase:  "apMSO",
 		NamePascalCase: "ApMSO",
+		NameSnakeCase:  "ap_mso",
 		DefaultFlag:    "--ap-mso",
 		ArgNames:       []string{"mso"},
 		Executable:     false,
@@ -3672,6 +4820,7 @@ var (
 		Name:           "ap-username",
 		NameCamelCase:  "apUsername",
 		NamePascalCase: "ApUsername",
+		NameSnakeCase:  "ap_username",
 		DefaultFlag:    "--ap-username",
 		ArgNames:       []string{"username"},
 		Executable:     false,
@@ -3686,6 +4835,7 @@ var (
 		Name:           "ap-password",
 		NameCamelCase:  "apPassword",
 		NamePascalCase: "ApPassword",
+		NameSnakeCase:  "ap_password",
 		DefaultFlag:    "--ap-password",
 		ArgNames:       []string{"password"},
 		Executable:     false,
@@ -3700,6 +4850,7 @@ var (
 		Name:           "ap-list-mso",
 		NameCamelCase:  "apListMSO",
 		NamePascalCase: "ApListMSO",
+		NameSnakeCase:  "ap_list_mso",
 		DefaultFlag:    "--ap-list-mso",
 		Executable:     false,
 		Help:           "List all supported multiple-system operators",
@@ -3711,6 +4862,7 @@ var (
 		Name:           "client-certificate",
 		NameCamelCase:  "clientCertificate",
 		NamePascalCase: "ClientCertificate",
+		NameSnakeCase:  "client_certificate",
 		DefaultFlag:    "--client-certificate",
 		ArgNames:       []string{"certfile"},
 		Executable:     false,
@@ -3725,6 +4877,7 @@ var (
 		Name:           "client-certificate-key",
 		NameCamelCase:  "clientCertificateKey",
 		NamePascalCase: "ClientCertificateKey",
+		NameSnakeCase:  "client_certificate_key",
 		DefaultFlag:    "--client-certificate-key",
 		ArgNames:       []string{"keyfile"},
 		Executable:     false,
@@ -3739,6 +4892,7 @@ var (
 		Name:           "client-certificate-password",
 		NameCamelCase:  "clientCertificatePassword",
 		NamePascalCase: "ClientCertificatePassword",
+		NameSnakeCase:  "client_certificate_password",
 		DefaultFlag:    "--client-certificate-password",
 		ArgNames:       []string{"password"},
 		Executable:     false,
@@ -3753,6 +4907,7 @@ var (
 		Name:           "extract-audio",
 		NameCamelCase:  "extractAudio",
 		NamePascalCase: "ExtractAudio",
+		NameSnakeCase:  "extract_audio",
 		DefaultFlag:    "--extract-audio",
 		Executable:     false,
 		Help:           "Convert video files to audio-only files (requires ffmpeg and ffprobe)",
@@ -3765,6 +4920,7 @@ var (
 		Name:           "audio-format",
 		NameCamelCase:  "audioFormat",
 		NamePascalCase: "AudioFormat",
+		NameSnakeCase:  "audio_format",
 		DefaultFlag:    "--audio-format",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -3779,6 +4935,7 @@ var (
 		Name:           "audio-quality",
 		NameCamelCase:  "audioQuality",
 		NamePascalCase: "AudioQuality",
+		NameSnakeCase:  "audio_quality",
 		DefaultFlag:    "--audio-quality",
 		ArgNames:       []string{"quality"},
 		Executable:     false,
@@ -3793,6 +4950,7 @@ var (
 		Name:           "remux-video",
 		NameCamelCase:  "remuxVideo",
 		NamePascalCase: "RemuxVideo",
+		NameSnakeCase:  "remux_video",
 		DefaultFlag:    "--remux-video",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -3807,6 +4965,7 @@ var (
 		Name:           "recode-video",
 		NameCamelCase:  "recodeVideo",
 		NamePascalCase: "RecodeVideo",
+		NameSnakeCase:  "recode_video",
 		DefaultFlag:    "--recode-video",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -3821,6 +4980,7 @@ var (
 		Name:           "postprocessor-args",
 		NameCamelCase:  "postProcessorArgs",
 		NamePascalCase: "PostProcessorArgs",
+		NameSnakeCase:  "postprocessor_args",
 		DefaultFlag:    "--postprocessor-args",
 		ArgNames:       []string{"nameargs"},
 		Executable:     false,
@@ -3835,6 +4995,7 @@ var (
 		Name:           "keep-video",
 		NameCamelCase:  "keepVideo",
 		NamePascalCase: "KeepVideo",
+		NameSnakeCase:  "keep_video",
 		DefaultFlag:    "--keep-video",
 		Executable:     false,
 		Help:           "Keep the intermediate video file on disk after post-processing",
@@ -3847,6 +5008,7 @@ var (
 		Name:           "no-keep-video",
 		NameCamelCase:  "noKeepVideo",
 		NamePascalCase: "NoKeepVideo",
+		NameSnakeCase:  "no_keep_video",
 		DefaultFlag:    "--no-keep-video",
 		Executable:     false,
 		Help:           "Delete the intermediate video file after post-processing (default)",
@@ -3858,6 +5020,7 @@ var (
 		Name:           "post-overwrites",
 		NameCamelCase:  "postOverwrites",
 		NamePascalCase: "PostOverwrites",
+		NameSnakeCase:  "post_overwrites",
 		DefaultFlag:    "--post-overwrites",
 		Executable:     false,
 		Help:           "Overwrite post-processed files (default)",
@@ -3869,6 +5032,7 @@ var (
 		Name:           "no-post-overwrites",
 		NameCamelCase:  "noPostOverwrites",
 		NamePascalCase: "NoPostOverwrites",
+		NameSnakeCase:  "no_post_overwrites",
 		DefaultFlag:    "--no-post-overwrites",
 		Executable:     false,
 		Help:           "Do not overwrite post-processed files",
@@ -3880,6 +5044,7 @@ var (
 		Name:           "embed-subs",
 		NameCamelCase:  "embedSubs",
 		NamePascalCase: "EmbedSubs",
+		NameSnakeCase:  "embed_subs",
 		DefaultFlag:    "--embed-subs",
 		Executable:     false,
 		Help:           "Embed subtitles in the video (only for mp4, webm and mkv videos)",
@@ -3891,6 +5056,7 @@ var (
 		Name:           "no-embed-subs",
 		NameCamelCase:  "noEmbedSubs",
 		NamePascalCase: "NoEmbedSubs",
+		NameSnakeCase:  "no_embed_subs",
 		DefaultFlag:    "--no-embed-subs",
 		Executable:     false,
 		Help:           "Do not embed subtitles (default)",
@@ -3902,6 +5068,7 @@ var (
 		Name:           "embed-thumbnail",
 		NameCamelCase:  "embedThumbnail",
 		NamePascalCase: "EmbedThumbnail",
+		NameSnakeCase:  "embed_thumbnail",
 		DefaultFlag:    "--embed-thumbnail",
 		Executable:     false,
 		Help:           "Embed thumbnail in the video as cover art",
@@ -3913,6 +5080,7 @@ var (
 		Name:           "no-embed-thumbnail",
 		NameCamelCase:  "noEmbedThumbnail",
 		NamePascalCase: "NoEmbedThumbnail",
+		NameSnakeCase:  "no_embed_thumbnail",
 		DefaultFlag:    "--no-embed-thumbnail",
 		Executable:     false,
 		Help:           "Do not embed thumbnail (default)",
@@ -3924,6 +5092,7 @@ var (
 		Name:           "embed-metadata",
 		NameCamelCase:  "embedMetadata",
 		NamePascalCase: "EmbedMetadata",
+		NameSnakeCase:  "embed_metadata",
 		DefaultFlag:    "--embed-metadata",
 		Executable:     false,
 		Help:           "Embed metadata to the video file. Also embeds chapters/infojson if present unless --no-embed-chapters/--no-embed-info-json are used",
@@ -3935,6 +5104,7 @@ var (
 		Name:           "no-embed-metadata",
 		NameCamelCase:  "noEmbedMetadata",
 		NamePascalCase: "NoEmbedMetadata",
+		NameSnakeCase:  "no_embed_metadata",
 		DefaultFlag:    "--no-embed-metadata",
 		Executable:     false,
 		Help:           "Do not add metadata to file (default)",
@@ -3946,6 +5116,7 @@ var (
 		Name:           "embed-chapters",
 		NameCamelCase:  "embedChapters",
 		NamePascalCase: "EmbedChapters",
+		NameSnakeCase:  "embed_chapters",
 		DefaultFlag:    "--embed-chapters",
 		Executable:     false,
 		Help:           "Add chapter markers to the video file",
@@ -3957,6 +5128,7 @@ var (
 		Name:           "no-embed-chapters",
 		NameCamelCase:  "noEmbedChapters",
 		NamePascalCase: "NoEmbedChapters",
+		NameSnakeCase:  "no_embed_chapters",
 		DefaultFlag:    "--no-embed-chapters",
 		Executable:     false,
 		Help:           "Do not add chapter markers (default)",
@@ -3968,6 +5140,7 @@ var (
 		Name:           "embed-info-json",
 		NameCamelCase:  "embedInfoJSON",
 		NamePascalCase: "EmbedInfoJSON",
+		NameSnakeCase:  "embed_info_json",
 		DefaultFlag:    "--embed-info-json",
 		Executable:     false,
 		Help:           "Embed the infojson as an attachment to mkv/mka video files",
@@ -3979,6 +5152,7 @@ var (
 		Name:           "no-embed-info-json",
 		NameCamelCase:  "noEmbedInfoJSON",
 		NamePascalCase: "NoEmbedInfoJSON",
+		NameSnakeCase:  "no_embed_info_json",
 		DefaultFlag:    "--no-embed-info-json",
 		Executable:     false,
 		Help:           "Do not embed the infojson as an attachment to the video file",
@@ -3990,6 +5164,7 @@ var (
 		Name:           "metadata-from-title",
 		NameCamelCase:  "metadataFromTitle",
 		NamePascalCase: "MetadataFromTitle",
+		NameSnakeCase:  "metadata_from_title",
 		DefaultFlag:    "--metadata-from-title",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -4005,14 +5180,15 @@ var (
 		Name:           "parse-metadata",
 		NameCamelCase:  "parseMetadata",
 		NamePascalCase: "ParseMetadata",
+		NameSnakeCase:  "parse_metadata",
 		URLs: []*OptionURL{
 			{
 				Name: "Modifying Metadata",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#modifying-metadata",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#modifying-metadata",
 			},
 			{
 				Name: "Modifying Metadata Examples",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#modifying-metadata-examples",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#modifying-metadata-examples",
 			},
 		},
 		DefaultFlag: "--parse-metadata",
@@ -4029,14 +5205,15 @@ var (
 		Name:           "replace-in-metadata",
 		NameCamelCase:  "replaceInMetadata",
 		NamePascalCase: "ReplaceInMetadata",
+		NameSnakeCase:  "replace_in_metadata",
 		URLs: []*OptionURL{
 			{
 				Name: "Modifying Metadata",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#modifying-metadata",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#modifying-metadata",
 			},
 			{
 				Name: "Modifying Metadata Examples",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#modifying-metadata-examples",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#modifying-metadata-examples",
 			},
 		},
 		DefaultFlag: "--replace-in-metadata",
@@ -4053,6 +5230,7 @@ var (
 		Name:           "xattrs",
 		NameCamelCase:  "xattrs",
 		NamePascalCase: "Xattrs",
+		NameSnakeCase:  "xattrs",
 		DefaultFlag:    "--xattrs",
 		Executable:     false,
 		Help:           "Write metadata to the video file's xattrs (using Dublin Core and XDG standards)",
@@ -4064,10 +5242,11 @@ var (
 		Name:           "concat-playlist",
 		NameCamelCase:  "concatPlaylist",
 		NamePascalCase: "ConcatPlaylist",
+		NameSnakeCase:  "concat_playlist",
 		URLs: []*OptionURL{
 			{
 				Name: "Output Template",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#output-template",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#output-template",
 			},
 		},
 		DefaultFlag: "--concat-playlist",
@@ -4085,6 +5264,7 @@ var (
 		Name:           "fixup",
 		NameCamelCase:  "fixup",
 		NamePascalCase: "Fixup",
+		NameSnakeCase:  "fixup",
 		DefaultFlag:    "--fixup",
 		ArgNames:       []string{"policy"},
 		Executable:     false,
@@ -4095,42 +5275,19 @@ var (
 		LongFlags:      []string{"--fixup"},
 		NArgs:          1,
 	}
-	optionPreferAVConv = &Option{
-		ID:             "prefer_ffmpeg",
-		Name:           "prefer-avconv",
-		NameCamelCase:  "preferAVConv",
-		NamePascalCase: "PreferAVConv",
-		DefaultFlag:    "--prefer-avconv",
-		Executable:     false,
-		Deprecated:     "avconv is not officially supported by yt-dlp.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--prefer-avconv", "--no-prefer-ffmpeg"},
-	}
-	optionPreferFFmpeg = &Option{
-		ID:             "prefer_ffmpeg",
-		Name:           "prefer-ffmpeg",
-		NameCamelCase:  "preferFFmpeg",
-		NamePascalCase: "PreferFFmpeg",
-		DefaultFlag:    "--prefer-ffmpeg",
-		Executable:     false,
-		Deprecated:     "This flag is now default in yt-dlp.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--prefer-ffmpeg", "--no-prefer-avconv"},
-	}
 	optionFFmpegLocation = &Option{
 		ID:             "ffmpeg_location",
 		Name:           "ffmpeg-location",
 		NameCamelCase:  "ffmpegLocation",
 		NamePascalCase: "FFmpegLocation",
+		NameSnakeCase:  "ffmpeg_location",
 		DefaultFlag:    "--ffmpeg-location",
 		ArgNames:       []string{"path"},
 		Executable:     false,
 		Help:           "Location of the ffmpeg binary; either the path to the binary or its containing directory",
 		MetaArgs:       "PATH",
 		Type:           "string",
-		LongFlags:      []string{"--ffmpeg-location", "--avconv-location"},
+		LongFlags:      []string{"--ffmpeg-location"},
 		NArgs:          1,
 	}
 	optionExec = &Option{
@@ -4138,6 +5295,7 @@ var (
 		Name:           "exec",
 		NameCamelCase:  "exec",
 		NamePascalCase: "Exec",
+		NameSnakeCase:  "exec",
 		DefaultFlag:    "--exec",
 		ArgNames:       []string{"cmd"},
 		Executable:     false,
@@ -4152,6 +5310,7 @@ var (
 		Name:           "no-exec",
 		NameCamelCase:  "noExec",
 		NamePascalCase: "NoExec",
+		NameSnakeCase:  "no_exec",
 		DefaultFlag:    "--no-exec",
 		Executable:     false,
 		Help:           "Remove any previously defined --exec",
@@ -4163,6 +5322,7 @@ var (
 		Name:           "exec-before-download",
 		NameCamelCase:  "execBeforeDownload",
 		NamePascalCase: "ExecBeforeDownload",
+		NameSnakeCase:  "exec_before_download",
 		DefaultFlag:    "--exec-before-download",
 		ArgNames:       []string{"cmd"},
 		Executable:     false,
@@ -4178,6 +5338,7 @@ var (
 		Name:           "no-exec-before-download",
 		NameCamelCase:  "noExecBeforeDownload",
 		NamePascalCase: "NoExecBeforeDownload",
+		NameSnakeCase:  "no_exec_before_download",
 		DefaultFlag:    "--no-exec-before-download",
 		Executable:     false,
 		Deprecated:     "Use [Command.NoExec] instead.",
@@ -4190,6 +5351,7 @@ var (
 		Name:           "convert-subs",
 		NameCamelCase:  "convertSubs",
 		NamePascalCase: "ConvertSubs",
+		NameSnakeCase:  "convert_subs",
 		DefaultFlag:    "--convert-subs",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -4204,6 +5366,7 @@ var (
 		Name:           "convert-thumbnails",
 		NameCamelCase:  "convertThumbnails",
 		NamePascalCase: "ConvertThumbnails",
+		NameSnakeCase:  "convert_thumbnails",
 		DefaultFlag:    "--convert-thumbnails",
 		ArgNames:       []string{"format"},
 		Executable:     false,
@@ -4218,10 +5381,11 @@ var (
 		Name:           "split-chapters",
 		NameCamelCase:  "splitChapters",
 		NamePascalCase: "SplitChapters",
+		NameSnakeCase:  "split_chapters",
 		URLs: []*OptionURL{
 			{
 				Name: "Output Template",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#output-template",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#output-template",
 			},
 		},
 		DefaultFlag: "--split-chapters",
@@ -4235,6 +5399,7 @@ var (
 		Name:           "no-split-chapters",
 		NameCamelCase:  "noSplitChapters",
 		NamePascalCase: "NoSplitChapters",
+		NameSnakeCase:  "no_split_chapters",
 		DefaultFlag:    "--no-split-chapters",
 		Executable:     false,
 		Help:           "Do not split video based on chapters (default)",
@@ -4246,6 +5411,7 @@ var (
 		Name:           "remove-chapters",
 		NameCamelCase:  "removeChapters",
 		NamePascalCase: "RemoveChapters",
+		NameSnakeCase:  "remove_chapters",
 		DefaultFlag:    "--remove-chapters",
 		ArgNames:       []string{"regex"},
 		Executable:     false,
@@ -4260,6 +5426,7 @@ var (
 		Name:           "no-remove-chapters",
 		NameCamelCase:  "noRemoveChapters",
 		NamePascalCase: "NoRemoveChapters",
+		NameSnakeCase:  "no_remove_chapters",
 		DefaultFlag:    "--no-remove-chapters",
 		Executable:     false,
 		Help:           "Do not remove any chapters from the file (default)",
@@ -4271,6 +5438,7 @@ var (
 		Name:           "force-keyframes-at-cuts",
 		NameCamelCase:  "forceKeyframesAtCuts",
 		NamePascalCase: "ForceKeyframesAtCuts",
+		NameSnakeCase:  "force_keyframes_at_cuts",
 		DefaultFlag:    "--force-keyframes-at-cuts",
 		Executable:     false,
 		Help:           "Force keyframes at cuts when downloading/splitting/removing sections. This is slow due to needing a re-encode, but the resulting video may have fewer artifacts around the cuts",
@@ -4282,6 +5450,7 @@ var (
 		Name:           "no-force-keyframes-at-cuts",
 		NameCamelCase:  "noForceKeyframesAtCuts",
 		NamePascalCase: "NoForceKeyframesAtCuts",
+		NameSnakeCase:  "no_force_keyframes_at_cuts",
 		DefaultFlag:    "--no-force-keyframes-at-cuts",
 		Executable:     false,
 		Help:           "Do not force keyframes around the chapters when cutting/splitting (default)",
@@ -4293,6 +5462,7 @@ var (
 		Name:           "use-postprocessor",
 		NameCamelCase:  "usePostProcessor",
 		NamePascalCase: "UsePostProcessor",
+		NameSnakeCase:  "use_postprocessor",
 		DefaultFlag:    "--use-postprocessor",
 		ArgNames:       []string{"name"},
 		Executable:     false,
@@ -4307,10 +5477,11 @@ var (
 		Name:           "sponsorblock-mark",
 		NameCamelCase:  "sponsorblockMark",
 		NamePascalCase: "SponsorblockMark",
+		NameSnakeCase:  "sponsorblock_mark",
 		DefaultFlag:    "--sponsorblock-mark",
 		ArgNames:       []string{"cats"},
 		Executable:     false,
-		Help:           "SponsorBlock categories to create chapters for, separated by commas. Available categories are sponsor, intro, outro, selfpromo, preview, filler, interaction, music_offtopic, poi_highlight, chapter, all and default (=all). You can prefix the category with a \"-\" to exclude it. See [1] for descriptions of the categories. E.g. --sponsorblock-mark all,-preview [1] https://wiki.sponsor.ajay.app/w/Segment_Categories",
+		Help:           "SponsorBlock categories to create chapters for, separated by commas. Available categories are sponsor, intro, outro, selfpromo, preview, filler, interaction, music_offtopic, hook, poi_highlight, chapter, all and default (=all). You can prefix the category with a \"-\" to exclude it. See [1] for descriptions of the categories. E.g. --sponsorblock-mark all,-preview [1] https://wiki.sponsor.ajay.app/w/Segment_Categories",
 		MetaArgs:       "CATS",
 		Type:           "string",
 		LongFlags:      []string{"--sponsorblock-mark"},
@@ -4321,6 +5492,7 @@ var (
 		Name:           "sponsorblock-remove",
 		NameCamelCase:  "sponsorblockRemove",
 		NamePascalCase: "SponsorblockRemove",
+		NameSnakeCase:  "sponsorblock_remove",
 		DefaultFlag:    "--sponsorblock-remove",
 		ArgNames:       []string{"cats"},
 		Executable:     false,
@@ -4335,6 +5507,7 @@ var (
 		Name:           "sponsorblock-chapter-title",
 		NameCamelCase:  "sponsorblockChapterTitle",
 		NamePascalCase: "SponsorblockChapterTitle",
+		NameSnakeCase:  "sponsorblock_chapter_title",
 		DefaultFlag:    "--sponsorblock-chapter-title",
 		ArgNames:       []string{"template"},
 		Executable:     false,
@@ -4349,6 +5522,7 @@ var (
 		Name:           "no-sponsorblock",
 		NameCamelCase:  "noSponsorblock",
 		NamePascalCase: "NoSponsorblock",
+		NameSnakeCase:  "no_sponsorblock",
 		DefaultFlag:    "--no-sponsorblock",
 		Executable:     false,
 		Help:           "Disable both --sponsorblock-mark and --sponsorblock-remove",
@@ -4360,6 +5534,7 @@ var (
 		Name:           "sponsorblock-api",
 		NameCamelCase:  "sponsorblockAPI",
 		NamePascalCase: "SponsorblockAPI",
+		NameSnakeCase:  "sponsorblock_api",
 		DefaultFlag:    "--sponsorblock-api",
 		ArgNames:       []string{"url"},
 		Executable:     false,
@@ -4369,113 +5544,12 @@ var (
 		LongFlags:      []string{"--sponsorblock-api"},
 		NArgs:          1,
 	}
-	optionSponskrub = &Option{
-		ID:             "sponskrub",
-		Name:           "sponskrub",
-		NameCamelCase:  "sponskrub",
-		NamePascalCase: "Sponskrub",
-		DefaultFlag:    "--sponskrub",
-		Executable:     false,
-		Deprecated:     "Use [Command.SponsorblockMark] with `all` as an argument.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--sponskrub"},
-	}
-	optionNoSponskrub = &Option{
-		ID:             "sponskrub",
-		Name:           "no-sponskrub",
-		NameCamelCase:  "noSponskrub",
-		NamePascalCase: "NoSponskrub",
-		DefaultFlag:    "--no-sponskrub",
-		Executable:     false,
-		Deprecated:     "Use [Command.NoSponsorblock] instead.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--no-sponskrub"},
-	}
-	optionSponskrubCut = &Option{
-		ID:             "sponskrub_cut",
-		Name:           "sponskrub-cut",
-		NameCamelCase:  "sponskrubCut",
-		NamePascalCase: "SponskrubCut",
-		DefaultFlag:    "--sponskrub-cut",
-		Executable:     false,
-		Deprecated:     "Use [Command.SponsorblockRemove] with `all` as an argument.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--sponskrub-cut"},
-	}
-	optionNoSponskrubCut = &Option{
-		ID:             "sponskrub_cut",
-		Name:           "no-sponskrub-cut",
-		NameCamelCase:  "noSponskrubCut",
-		NamePascalCase: "NoSponskrubCut",
-		DefaultFlag:    "--no-sponskrub-cut",
-		Executable:     false,
-		Deprecated:     "Use [Command.SponsorblockRemove] with `-all` as an argument.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--no-sponskrub-cut"},
-	}
-	optionSponskrubForce = &Option{
-		ID:             "sponskrub_force",
-		Name:           "sponskrub-force",
-		NameCamelCase:  "sponskrubForce",
-		NamePascalCase: "SponskrubForce",
-		DefaultFlag:    "--sponskrub-force",
-		Executable:     false,
-		Deprecated:     "No longer applicable.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--sponskrub-force"},
-	}
-	optionNoSponskrubForce = &Option{
-		ID:             "sponskrub_force",
-		Name:           "no-sponskrub-force",
-		NameCamelCase:  "noSponskrubForce",
-		NamePascalCase: "NoSponskrubForce",
-		DefaultFlag:    "--no-sponskrub-force",
-		Executable:     false,
-		Deprecated:     "No longer applicable.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--no-sponskrub-force"},
-	}
-	optionSponskrubLocation = &Option{
-		ID:             "sponskrub_path",
-		Name:           "sponskrub-location",
-		NameCamelCase:  "sponskrubLocation",
-		NamePascalCase: "SponskrubLocation",
-		DefaultFlag:    "--sponskrub-location",
-		ArgNames:       []string{"path"},
-		Executable:     false,
-		Deprecated:     "No longer applicable.",
-		Hidden:         true,
-		MetaArgs:       "PATH",
-		Type:           "string",
-		LongFlags:      []string{"--sponskrub-location"},
-		NArgs:          1,
-	}
-	optionSponskrubArgs = &Option{
-		ID:             "sponskrub_args",
-		Name:           "sponskrub-args",
-		NameCamelCase:  "sponskrubArgs",
-		NamePascalCase: "SponskrubArgs",
-		DefaultFlag:    "--sponskrub-args",
-		ArgNames:       []string{"args"},
-		Executable:     false,
-		Deprecated:     "No longer applicable.",
-		Hidden:         true,
-		MetaArgs:       "ARGS",
-		Type:           "string",
-		LongFlags:      []string{"--sponskrub-args"},
-		NArgs:          1,
-	}
 	optionExtractorRetries = &Option{
 		ID:             "extractor_retries",
 		Name:           "extractor-retries",
 		NameCamelCase:  "extractorRetries",
 		NamePascalCase: "ExtractorRetries",
+		NameSnakeCase:  "extractor_retries",
 		DefaultFlag:    "--extractor-retries",
 		ArgNames:       []string{"retries"},
 		Executable:     false,
@@ -4490,6 +5564,7 @@ var (
 		Name:           "allow-dynamic-mpd",
 		NameCamelCase:  "allowDynamicMPD",
 		NamePascalCase: "AllowDynamicMPD",
+		NameSnakeCase:  "allow_dynamic_mpd",
 		DefaultFlag:    "--allow-dynamic-mpd",
 		Executable:     false,
 		Help:           "Process dynamic DASH manifests (default)",
@@ -4501,6 +5576,7 @@ var (
 		Name:           "ignore-dynamic-mpd",
 		NameCamelCase:  "ignoreDynamicMPD",
 		NamePascalCase: "IgnoreDynamicMPD",
+		NameSnakeCase:  "ignore_dynamic_mpd",
 		DefaultFlag:    "--ignore-dynamic-mpd",
 		Executable:     false,
 		Help:           "Do not process dynamic DASH manifests",
@@ -4512,6 +5588,7 @@ var (
 		Name:           "hls-split-discontinuity",
 		NameCamelCase:  "hlsSplitDiscontinuity",
 		NamePascalCase: "HLSSplitDiscontinuity",
+		NameSnakeCase:  "hls_split_discontinuity",
 		DefaultFlag:    "--hls-split-discontinuity",
 		Executable:     false,
 		Help:           "Split HLS playlists to different formats at discontinuities such as ad breaks",
@@ -4523,6 +5600,7 @@ var (
 		Name:           "no-hls-split-discontinuity",
 		NameCamelCase:  "noHLSSplitDiscontinuity",
 		NamePascalCase: "NoHLSSplitDiscontinuity",
+		NameSnakeCase:  "no_hls_split_discontinuity",
 		DefaultFlag:    "--no-hls-split-discontinuity",
 		Executable:     false,
 		Help:           "Do not split HLS playlists into different formats at discontinuities such as ad breaks (default)",
@@ -4534,10 +5612,11 @@ var (
 		Name:           "extractor-args",
 		NameCamelCase:  "extractorArgs",
 		NamePascalCase: "ExtractorArgs",
+		NameSnakeCase:  "extractor_args",
 		URLs: []*OptionURL{
 			{
 				Name: "Extractor Arguments",
-				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2025.03.31/README.md#extractor-arguments",
+				URL:  "https://github.com/yt-dlp/yt-dlp/blob/2026.03.17/README.md#extractor-arguments",
 			},
 		},
 		DefaultFlag: "--extractor-args",
@@ -4548,53 +5627,5 @@ var (
 		Type:        "string",
 		LongFlags:   []string{"--extractor-args"},
 		NArgs:       1,
-	}
-	optionYoutubeIncludeDashManifest = &Option{
-		ID:             "youtube_include_dash_manifest",
-		Name:           "youtube-include-dash-manifest",
-		NameCamelCase:  "youtubeIncludeDashManifest",
-		NamePascalCase: "YoutubeIncludeDashManifest",
-		DefaultFlag:    "--youtube-include-dash-manifest",
-		Executable:     false,
-		Deprecated:     "Use [Command.YoutubeIncludeDashManifest] instead.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--youtube-include-dash-manifest", "--no-youtube-skip-dash-manifest"},
-	}
-	optionYoutubeSkipDashManifest = &Option{
-		ID:             "youtube_include_dash_manifest",
-		Name:           "youtube-skip-dash-manifest",
-		NameCamelCase:  "youtubeSkipDashManifest",
-		NamePascalCase: "YoutubeSkipDashManifest",
-		DefaultFlag:    "--youtube-skip-dash-manifest",
-		Executable:     false,
-		Deprecated:     "Use [Command.ExtractorArgs] with `youtube:skip=dash` as an argument.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--youtube-skip-dash-manifest", "--no-youtube-include-dash-manifest"},
-	}
-	optionYoutubeIncludeHLSManifest = &Option{
-		ID:             "youtube_include_hls_manifest",
-		Name:           "youtube-include-hls-manifest",
-		NameCamelCase:  "youtubeIncludeHLSManifest",
-		NamePascalCase: "YoutubeIncludeHLSManifest",
-		DefaultFlag:    "--youtube-include-hls-manifest",
-		Executable:     false,
-		Deprecated:     "Use [Command.YoutubeIncludeHLSManifest] instead.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--youtube-include-hls-manifest", "--no-youtube-skip-hls-manifest"},
-	}
-	optionYoutubeSkipHLSManifest = &Option{
-		ID:             "youtube_include_hls_manifest",
-		Name:           "youtube-skip-hls-manifest",
-		NameCamelCase:  "youtubeSkipHLSManifest",
-		NamePascalCase: "YoutubeSkipHLSManifest",
-		DefaultFlag:    "--youtube-skip-hls-manifest",
-		Executable:     false,
-		Deprecated:     "Use [Command.ExtractorArgs] with `youtube:skip=hls` as an argument.",
-		Hidden:         true,
-		Type:           "bool",
-		LongFlags:      []string{"--youtube-skip-hls-manifest", "--no-youtube-include-hls-manifest"},
 	}
 )
