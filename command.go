@@ -40,6 +40,7 @@ type Command struct {
 	separateProcessGroup bool
 	cancelMaxWait        time.Duration
 	disableEnvVarInherit bool
+	extraFlags           Flags
 
 	progress *progressHandler
 	stderr   *stderrHandler
@@ -205,6 +206,10 @@ func (c *Command) BuildCommand(ctx context.Context, args ...string) *exec.Cmd {
 	}
 
 	for _, f := range c.flagConfig.ToFlags() {
+		cmdArgs = append(cmdArgs, f.Raw()...)
+	}
+
+	for _, f := range c.extraFlags {
 		cmdArgs = append(cmdArgs, f.Raw()...)
 	}
 

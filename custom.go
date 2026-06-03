@@ -9,15 +9,18 @@ func (c *Command) Custom(name string, args ...string) *Command {
 		return c
 	}
 
-	if len(args) == 0 {
-		args = nil
+	var anyArgs []any
+	for _, a := range args {
+		anyArgs = append(anyArgs, a)
 	}
 
-	c.addFlag(&Flag{
-		ID:   "",
+	c.mu.Lock()
+	c.extraFlags = append(c.extraFlags, &Flag{
+		ID: "",
 		Flag: "--" + name,
-		Args: args,
+		Args: anyArgs,
 	})
+	c.mu.Unlock()
 
 	return c
 }
