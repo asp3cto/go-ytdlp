@@ -331,10 +331,18 @@ func cleanJSON(input any) {
 
 		// If pointer to string, and value is "none" or empty, set to nil.
 		if field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.String && (field.Elem().String() == "none" || field.Elem().String() == "") {
+			fieldName := v.Type().Field(i).Name
+
 			// If field name == "Title", set to empty string instead of nil.
 			// See [ExtractedInfo.Title] for more info.
-			if v.Type().Field(i).Name == "Title" {
+			if fieldName == "Title" {
 				field.Elem().SetString("")
+				continue
+			}
+
+			// ACodec/VCodec: preserve "none" as-is — yt-dlp uses it to signal
+			// "definitely no audio/video", distinct from nil ("unknown codec").
+			if (fieldName == "ACodec" || fieldName == "VCodec") && field.Elem().String() == "none" {
 				continue
 			}
 
@@ -473,7 +481,7 @@ type ExtractedInfo struct {
 	// Subtitles contains the available subtitles, where the key is the language
 	// code, and the value is a list of subtitle formats.
 	Subtitles          map[string][]*ExtractedSubtitle `json:"subtitles,omitempty"`
-	RequestedSubtitles map[string]*ExtractedSubtitle `json:"requested_subtitles,omitempty"`
+	RequestedSubtitles map[string]*ExtractedSubtitle   `json:"requested_subtitles,omitempty"`
 
 	// AutomaticCaptions contains the automatically generated captions instead of
 	// normal subtitles.

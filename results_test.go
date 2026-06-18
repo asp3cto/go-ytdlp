@@ -6,6 +6,7 @@ package ytdlp
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -103,4 +104,66 @@ func TestExtractedInfo(t *testing.T) {
 
 	require.NotNil(t, info[0].ExtractorKey, "expected extractor key to be set")
 	assert.Equal(t, "Generic", *info[0].ExtractorKey, "expected extractor key to be generic")
+}
+
+func TestExtractedInfoParse(t *testing.T) {
+	noneStr := "none"
+
+	tests := []struct {
+		testName       string
+		json           json.RawMessage
+		expectedFormat ExtractedFormat
+	}{
+		{
+			testName: "acodec/vcodec: preserve none",
+			json:     json.RawMessage(`{"acodec": "none", "vcodec": "none"}`),
+			expectedFormat: ExtractedFormat{
+				ACodec: &noneStr,
+				VCodec: &noneStr,
+			},
+		},
+		{
+			testName: "acodec/vcodec: parse null as nil",
+			json:     json.RawMessage(`{"acodec": null, "vcodec": null}`),
+			expectedFormat: ExtractedFormat{
+				ACodec: nil,
+				VCodec: nil,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.testName, func(t *testing.T) {
+			got, err := ParseExtractedInfo(&tc.json)
+			require.NoError(t, err)
+
+			if tc.expectedFormat.ACodec == nil {
+				assert.Equal(t, tc.expectedFormat.ACodec, got.ACodec)
+			} else {
+				assert.Equal(t, *tc.expectedFormat.ACodec, *got.ACodec)
+			}
+
+			if tc.expectedFormat.VCodec == nil {
+				assert.Equal(t, tc.expectedFormat.VCodec, got.VCodec)
+			} else {
+				assert.Equal(t, *tc.expectedFormat.VCodec, *got.VCodec)
+			}
+		})
+	}
+
+	t.Run("title: parse none as empty string", func(t *testing.T) {
+		raw := json.RawMessage(`{"title": "none"}`)
+		got, err := ParseExtractedInfo(&raw)
+		require.NoError(t, err)
+
+		assert.Equal(t, "", *got.Title)
+	})
+
+	t.Run("other field: parse none as nil", func(t *testing.T) {
+		raw := json.RawMessage(`{"thumbnail": "none"}`)
+		got, err := ParseExtractedInfo(&raw)
+		require.NoError(t, err)
+
+		assert.Nil(t, got.Thumbnail)
+	})
 }
